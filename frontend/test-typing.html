@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Animation Test</title>
+    <style>
+        .typing-text {
+            color: #D8C4B6 !important;
+            border-right: 2px solid #D8C4B6 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            display: inline-block !important;
+            width: 0 !important;
+            animation: none !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .typing-text.typing-complete {
+            border-right: none !important;
+            width: auto !important;
+            color: #D8C4B6 !important;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 1.5rem !important;
+            color: white !important;
+        }
+        
+        body {
+            background-color: #4F709C;
+            padding: 50px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="hero-title">
+        Protect Your Digital Life with 
+        <span class="typing-text">AI-Powered Phishing Detection</span>
+    </h1>
+    
+    <script>
+        function startTypingAnimation() {
+            console.log('Starting typing animation...');
+            
+            const typingElement = document.querySelector('.typing-text');
+            if (!typingElement) {
+                console.log('Typing element not found');
+                return;
+            }
+            
+            const originalText = typingElement.textContent;
+            console.log('Original text:', originalText);
+            
+            if (!originalText || originalText.trim() === '') {
+                console.log('No text to animate');
+                return;
+            }
+            
+            // Clear the element and set initial state
+            typingElement.textContent = '';
+            typingElement.style.width = '0';
+            typingElement.style.borderRight = '2px solid #D8C4B6';
+            typingElement.style.color = '#D8C4B6';
+            typingElement.style.display = 'inline-block';
+            typingElement.style.whiteSpace = 'nowrap';
+            typingElement.style.overflow = 'hidden';
+            
+            console.log('Starting to type:', originalText);
+            
+            let i = 0;
+            const typeWriter = () => {
+                if (i < originalText.length) {
+                    typingElement.textContent += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 100); // Typing speed
+                } else {
+                    // Animation complete - remove cursor after a delay
+                    setTimeout(() => {
+                        typingElement.style.borderRight = 'none';
+                        typingElement.classList.add('typing-complete');
+                        console.log('Typing animation completed');
+                    }, 1000);
+                }
+            };
+            
+            // Start typing after a short delay
+            setTimeout(typeWriter, 500);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Test page loaded');
+            
+            // Wait a bit more to ensure everything is loaded
+            setTimeout(() => {
+                startTypingAnimation();
+            }, 100);
+        });
+    </script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

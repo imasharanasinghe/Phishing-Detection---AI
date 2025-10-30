@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Assistance</title>
+  <link rel="stylesheet" href="styles.css?v=auth1">
+  <style>
+    :root{--blue:#2a4a78;--navy:#042d64}
+    body{background:#213555;color:#1e293b;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+    .shell{min-height:100vh;display:grid;place-items:center;padding:2rem}
+    .card{width:100%;max-width:460px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:1.75rem}
+    .title{font-size:1.6rem;font-weight:700;color:var(--navy);text-align:center;margin-bottom:.25rem}
+    .subtitle{font-size:.95rem;color:#6b7280;text-align:center;margin-bottom:1.25rem}
+    .field{margin-bottom:1rem}
+    .label{display:block;font-size:.9rem;font-weight:600;margin-bottom:.4rem;color:#334155}
+    .input-wrap{position:relative}
+    .input{width:100%;padding:.85rem 2.75rem .85rem 1rem;border:none;border-radius:10px;background:#e8f0fe;color:#111827;font-size:.95rem;transition:.2s}
+    .input:hover{background:#dce9ff}
+    .input:focus{outline:none;background:#d2e2ff;box-shadow:0 0 0 2px rgba(42,74,120,.25)}
+    .eye{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:.25rem;color:#334155}
+    .eye svg{width:20px;height:20px}
+    .btn{width:100%;padding:.9rem 1rem;border:none;border-radius:10px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;transition:.2s}
+    .btn:hover{filter:brightness(1.05)}
+    .err{display:none;color:#b91c1c;font-size:.8rem;margin-top:.4rem}
+    .toast{display:none;margin-bottom:.75rem;padding:.75rem;border-radius:10px;font-size:.9rem}
+    .toast.on{display:block;background:#ecfeff;color:#075985}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <div id="headTitle" class="title">Forgot Password</div>
+      <div id="headSub" class="subtitle">Enter your email to receive a reset link</div>
+      <div id="toast" class="toast"></div>
+
+      <div id="forgotView">
+        <div class="field">
+          <label class="label" for="femail">Email</label>
+          <div class="input-wrap"><input id="femail" type="email" class="input" autocomplete="email"></div>
+          <div id="femailErr" class="err"></div>
+        </div>
+        <button id="forgotBtn" class="btn">Send Reset Link</button>
+      </div>
+
+      <div id="resetView" style="display:none">
+        <div class="field">
+          <label class="label" for="rpass">New Password</label>
+          <div class="input-wrap">
+            <input id="rpass" type="password" class="input" autocomplete="new-password">
+            <button id="rpEye" class="eye" type="button" aria-label="Show password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div id="rpassErr" class="err"></div>
+        </div>
+        <div class="field">
+          <label class="label" for="rcpass">Confirm Password</label>
+          <div class="input-wrap">
+            <input id="rcpass" type="password" class="input" autocomplete="new-password">
+            <button id="rcEye" class="eye" type="button" aria-label="Show password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div id="rcpassErr" class="err"></div>
+        </div>
+        <button id="resetBtn" class="btn">Update Password</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth-common.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    const toast = document.getElementById('toast');
+
+    function showToast(text){ toast.textContent=text; toast.className='toast on'; }
+
+    if (token) {
+      document.getElementById('forgotView').style.display='none';
+      document.getElementById('resetView').style.display='block';
+      document.getElementById('headTitle').textContent = 'Reset Password';
+      document.getElementById('headSub').textContent = 'Choose a new password for your account';
+      Auth.togglePasswordVisibility(document.getElementById('rpEye'), document.getElementById('rpass'));
+      Auth.togglePasswordVisibility(document.getElementById('rcEye'), document.getElementById('rcpass'));
+
+      document.getElementById('resetBtn').addEventListener('click', async ()=>{
+        const p = document.getElementById('rpass').value;
+        const c = document.getElementById('rcpass').value;
+        document.getElementById('rpassErr').style.display='none';
+        document.getElementById('rcpassErr').style.display='none';
+        if (!Auth.validatePassword(p)) { Auth.showInlineError(document.getElementById('rpassErr'), 'Min 8 chars with upper, lower and a number'); return; }
+        if (p!==c) { Auth.showInlineError(document.getElementById('rcpassErr'), 'Passwords must match'); return; }
+        try{ await Auth.postJSON('/api/auth/reset', { token, password:p }); showToast('Password updated. You can sign in now.'); setTimeout(()=>location.href='auth-signin.html', 1500); }catch(e){ showToast(e?.message||'Reset failed'); }
+      });
+    } else {
+      document.getElementById('forgotBtn').addEventListener('click', async ()=>{
+        const email = document.getElementById('femail').value.trim();
+        if (!Auth.validateEmail(email)) { Auth.showInlineError(document.getElementById('femailErr'),'Enter a valid email'); return; }
+        try{ await Auth.postJSON('/api/auth/forgot',{ email }); showToast('If an account exists, a reset email was sent.'); }catch(e){ showToast('Unable to process request right now.'); }
+      });
+    }
+  </script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

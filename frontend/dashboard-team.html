@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=41">
+    <style>
+        .dash-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .dash-sidebar { background:#1a2a48; border-right:1px solid rgba(255,255,255,0.14); padding:18px; position:sticky; top:0; height:100vh; }
+        .dash-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; letter-spacing:.2px; }
+        .dash-nav { margin-top:18px; display:flex; flex-direction:column; gap:4px; }
+        .dash-link { color:#EAF1FB; padding:10px 12px; border-radius:10px; text-decoration:none; display:flex; align-items:center; gap:10px; border:1px solid transparent; }
+        .dash-link:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); }
+        .dash-link.active { background:rgba(255,255,255,0.10); border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.35) inset; color:#fff; }
+        .dash-hero { background:#213555; border-bottom:1px solid rgba(255,255,255,0.14); padding:24px 24px; color:#fff; }
+        .dash-hero .subtitle { color:#EAF1FB; opacity:.95; margin-top:6px; }
+        @media (max-width: 900px){ .dash-shell{ grid-template-columns: 1fr; } .dash-sidebar{ display:none; } }
+
+        /* Team page scoped styles */
+        .team-stats-section{ margin-bottom:32px; }
+        .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; }
+        .stat-card{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:20px; display:flex; align-items:center; gap:16px; }
+        .stat-icon{ font-size:2rem; }
+        .stat-content{ flex:1; }
+        .stat-number{ font-size:1.8rem; font-weight:700; color:#fff; margin-bottom:4px; }
+        .stat-label{ color:#9fb4d3; font-size:.9rem; }
+
+        .team-actions-section{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:24px; margin-bottom:24px; }
+        .actions-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:16px; }
+        .actions-header h2{ color:#fff; margin:0; font-size:1.5rem; }
+        .action-buttons{ display:flex; gap:12px; flex-wrap:wrap; }
+        .btn-primary{ background:#4F709C; color:#fff; border:1px solid #4F709C; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+        .btn-secondary{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+        .btn-primary:hover{ background:#3a5a80; border-color:#3a5a80; }
+        .btn-secondary:hover{ background:rgba(255,255,255,0.12); }
+
+        .team-filters{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; }
+        .filter-group{ display:flex; flex-direction:column; gap:6px; }
+        .filter-group label{ color:#EAF1FB; font-weight:600; font-size:.9rem; }
+        .filter-select, .filter-input{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:8px 10px; }
+
+        .team-members-section{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:24px; margin-bottom:24px; }
+        .members-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:16px; }
+        .members-header h3{ color:#fff; margin:0; font-size:1.3rem; }
+        .view-toggle{ display:flex; gap:4px; }
+        .view-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:6px 12px; border-radius:6px; cursor:pointer; font-size:.9rem; }
+        .view-btn.active{ background:#4F709C; border-color:#4F709C; color:#fff; }
+
+        .team-members-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; }
+        .member-card{ background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:20px; transition:all 0.3s ease; }
+        .member-card:hover{ background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); }
+        .member-card.pending{ border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.05); }
+
+        .member-avatar{ position:relative; width:60px; height:60px; margin-bottom:12px; }
+        .member-avatar img{ width:100%; height:100%; border-radius:50%; object-fit:cover; }
+        .avatar-placeholder{ width:100%; height:100%; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+        .status-indicator{ position:absolute; bottom:2px; right:2px; width:12px; height:12px; border-radius:50%; border:2px solid rgba(33,53,85,0.95); }
+        .status-indicator.active{ background:#10b981; }
+        .status-indicator.inactive{ background:#6b7280; }
+        .status-indicator.pending{ background:#f59e0b; }
+
+        .member-info h4{ color:#fff; margin:0 0 4px 0; font-size:1.1rem; }
+        .member-email{ color:#9fb4d3; margin:0 0 8px 0; font-size:.9rem; }
+        .member-role{ display:inline-block; padding:4px 8px; border-radius:999px; font-size:.8rem; font-weight:600; margin-bottom:8px; }
+        .member-role.admin{ background:rgba(79,112,156,0.2); color:#9db4d4; }
+        .member-role.agent{ background:rgba(5,150,105,0.2); color:#6ee7b7; }
+        .member-role.client{ background:rgba(217,119,6,0.2); color:#fcd34d; }
+        .member-role.viewer{ background:rgba(107,114,128,0.2); color:#d1d5db; }
+        .member-meta{ display:flex; flex-direction:column; gap:2px; margin-bottom:12px; }
+        .member-meta span{ color:#9fb4d3; font-size:.8rem; }
+
+        .member-actions{ display:flex; gap:6px; flex-wrap:wrap; }
+        .action-btn{ padding:6px 10px; border-radius:4px; cursor:pointer; border:1px solid; font-size:.8rem; font-weight:600; }
+        .action-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border-color:rgba(255,255,255,0.18); }
+        .action-btn.danger{ background:rgba(239,68,68,0.2); color:#fca5a5; border-color:rgba(239,68,68,0.4); }
+        .action-btn:hover{ opacity:0.8; }
+
+        .permissions-section{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:24px; margin-bottom:24px; }
+        .permissions-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:16px; }
+        .permissions-header h2{ color:#fff; margin:0; font-size:1.5rem; }
+        .permissions-table{ overflow-x:auto; }
+        .permissions-matrix{ width:100%; border-collapse:collapse; }
+        .permissions-matrix th{ background:rgba(255,255,255,0.08); color:#EAF1FB; padding:12px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); font-weight:600; }
+        .permissions-matrix td{ padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); color:#EAF1FB; }
+        .permissions-matrix tbody tr:hover{ background:rgba(255,255,255,0.04); }
+        .permission-badge{ padding:4px 8px; border-radius:4px; font-size:.8rem; font-weight:600; }
+        .permission-badge.granted{ background:rgba(16,185,129,0.2); color:#6ee7b7; }
+        .permission-badge.denied{ background:rgba(239,68,68,0.2); color:#fca5a5; }
+        .permission-badge.limited{ background:rgba(245,158,11,0.2); color:#fcd34d; }
+        .permissions-matrix th.highlighted, .permissions-matrix td.highlighted{ background:rgba(79,112,156,0.2); border:1px solid rgba(79,112,156,0.4); }
+
+        .activity-section{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:24px; }
+        .activity-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:16px; }
+        .activity-header h2{ color:#fff; margin:0; font-size:1.5rem; }
+        .activity-filters{ display:flex; gap:12px; }
+        .activity-timeline{ display:flex; flex-direction:column; gap:16px; }
+        .activity-item{ display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .activity-avatar{ width:40px; height:40px; }
+        .activity-avatar img{ width:100%; height:100%; border-radius:50%; object-fit:cover; }
+        .activity-content{ flex:1; }
+        .activity-text{ color:#EAF1FB; margin-bottom:4px; }
+        .activity-time{ color:#9fb4d3; font-size:.8rem; }
+        .activity-type{ padding:4px 8px; border-radius:999px; font-size:.8rem; font-weight:600; }
+        .activity-type.invite{ background:rgba(79,112,156,0.2); color:#9db4d4; }
+        .activity-type.analysis{ background:rgba(5,150,105,0.2); color:#6ee7b7; }
+        .activity-type.permissions{ background:rgba(245,158,11,0.2); color:#fcd34d; }
+        .activity-type.login{ background:rgba(107,114,128,0.2); color:#d1d5db; }
+
+        /* Modals */
+        .modal-overlay{ position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:1000; }
+        .invite-modal, .edit-member-modal{ background:#213555; border:1px solid rgba(255,255,255,0.2); border-radius:12px; max-width:600px; width:90vw; max-height:90vh; overflow:hidden; }
+        .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .modal-header h2{ color:#fff; margin:0; }
+        .modal-close{ background:none; border:none; color:#EAF1FB; font-size:1.5rem; cursor:pointer; }
+        .modal-body{ padding:20px; max-height:60vh; overflow-y:auto; }
+        .invite-form, .edit-member-form{ display:flex; flex-direction:column; gap:16px; }
+        .form-group{ display:flex; flex-direction:column; gap:6px; }
+        .form-group label{ color:#EAF1FB; font-weight:600; font-size:.9rem; }
+        .form-input, .form-select, .form-textarea{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:10px 12px; }
+        .form-textarea{ min-height:80px; resize:vertical; }
+        .permissions-preview{ background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:12px; }
+        .modal-footer{ display:flex; gap:12px; padding:20px; border-top:1px solid rgba(255,255,255,0.1); justify-content:flex-end; }
+
+        @media (max-width: 768px){
+            .stats-grid{ grid-template-columns:repeat(2, 1fr); }
+            .team-filters{ grid-template-columns:1fr; }
+            .team-members-grid{ grid-template-columns:1fr; }
+            .actions-header, .members-header, .permissions-header, .activity-header{ flex-direction:column; align-items:stretch; }
+            .action-buttons, .view-toggle{ justify-content:stretch; }
+            .activity-item{ flex-direction:column; text-align:center; }
+            .permissions-table{ font-size:.8rem; }
+        }
+    </style>
+</head>
+<body class="dashboard-modern">
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">Phishing Detection AI</div>
+            <nav class="dash-nav">
+                <a class="dash-link" href="dashboard.html">Overview</a>
+                <a class="dash-link" href="dashboard-analysis.html">Analysis</a>
+                <a class="dash-link" href="dashboard-history.html">History</a>
+                <a class="dash-link" href="dashboard-threats.html">Threats</a>
+                <a class="dash-link" href="dashboard-reports.html">Reports</a>
+                <a class="dash-link" href="dashboard-integrations.html">Integrations</a>
+                <a class="dash-link active" href="dashboard-team.html">Team</a>
+                <a class="dash-link" href="dashboard-plan.html">Plan & Billing</a>
+                <a class="dash-link" href="dashboard-settings.html">Settings</a>
+                <a class="dash-link" href="updates.html">Support</a>
+            </nav>
+        </aside>
+        <div>
+            <div class="dash-hero">
+                <h1 style="margin:0">Team & Roles</h1>
+                <div class="subtitle">Manage members, roles, and collaboration.</div>
+            </div>
+            <main class="dashboard-main" style="padding: 24px;">
+                <!-- Team Overview Stats -->
+                <div class="team-stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="totalMembers">12</div>
+                                <div class="stat-label">Team Members</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔐</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="activeAdmins">3</div>
+                                <div class="stat-label">Administrators</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📧</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="pendingInvites">2</div>
+                                <div class="stat-label">Pending Invites</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="activeUsers">9</div>
+                                <div class="stat-label">Active This Week</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Management Actions -->
+                <div class="team-actions-section">
+                    <div class="actions-header">
+                        <h2>Team Management</h2>
+                        <div class="action-buttons">
+                            <button id="inviteTeamMember" class="btn-primary">Invite Member</button>
+                            <button id="manageRoles" class="btn-secondary">Manage Roles</button>
+                            <button id="exportTeam" class="btn-secondary">Export Team</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Filters -->
+                    <div class="team-filters">
+                        <div class="filter-group">
+                            <label>Filter by Role:</label>
+                            <select id="roleFilter" class="filter-select">
+                                <option value="all">All Roles</option>
+                                <option value="admin">Administrator</option>
+                                <option value="agent">Security Agent</option>
+                                <option value="client">Client</option>
+                                <option value="viewer">Viewer</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Filter by Status:</label>
+                            <select id="statusFilter" class="filter-select">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Search:</label>
+                            <input type="text" id="teamSearch" class="filter-input" placeholder="Search by name or email...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Members List -->
+                <div class="team-members-section">
+                    <div class="members-header">
+                        <h3>Team Members</h3>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">Grid View</button>
+                            <button class="view-btn" data-view="list">List View</button>
+                        </div>
+                    </div>
+                    
+                    <div id="teamMembersGrid" class="team-members-grid">
+                        <!-- Admin Members -->
+                        <div class="member-card" data-role="admin" data-status="active">
+                            <div class="member-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Sarah+Johnson&background=4F709C&color=fff" alt="Sarah Johnson">
+                                <div class="status-indicator active"></div>
+                            </div>
+                            <div class="member-info">
+                                <h4>Sarah Johnson</h4>
+                                <p class="member-email">sarah.johnson@company.com</p>
+                                <div class="member-role admin">Administrator</div>
+                                <div class="member-meta">
+                                    <span>Last active: 2 hours ago</span>
+                                    <span>Joined: Jan 2024</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn" data-action="edit">Edit</button>
+                                <button class="action-btn" data-action="permissions">Permissions</button>
+                                <button class="action-btn danger" data-action="remove">Remove</button>
+                            </div>
+                        </div>
+
+                        <div class="member-card" data-role="admin" data-status="active">
+                            <div class="member-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=4F709C&color=fff" alt="Michael Chen">
+                                <div class="status-indicator active"></div>
+                            </div>
+                            <div class="member-info">
+                                <h4>Michael Chen</h4>
+                                <p class="member-email">michael.chen@company.com</p>
+                                <div class="member-role admin">Administrator</div>
+                                <div class="member-meta">
+                                    <span>Last active: 1 day ago</span>
+                                    <span>Joined: Dec 2023</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn" data-action="edit">Edit</button>
+                                <button class="action-btn" data-action="permissions">Permissions</button>
+                                <button class="action-btn danger" data-action="remove">Remove</button>
+                            </div>
+                        </div>
+
+                        <!-- Agent Members -->
+                        <div class="member-card" data-role="agent" data-status="active">
+                            <div class="member-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Emily+Rodriguez&background=059669&color=fff" alt="Emily Rodriguez">
+                                <div class="status-indicator active"></div>
+                            </div>
+                            <div class="member-info">
+                                <h4>Emily Rodriguez</h4>
+                                <p class="member-email">emily.rodriguez@company.com</p>
+                                <div class="member-role agent">Security Agent</div>
+                                <div class="member-meta">
+                                    <span>Last active: 30 minutes ago</span>
+                                    <span>Joined: Feb 2024</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn" data-action="edit">Edit</button>
+                                <button class="action-btn" data-action="permissions">Permissions</button>
+                                <button class="action-btn danger" data-action="remove">Remove</button>
+                            </div>
+                        </div>
+
+                        <div class="member-card" data-role="agent" data-status="active">
+                            <div class="member-avatar">
+                                <img src="https://ui-avatars.com/api/?name=David+Kim&background=059669&color=fff" alt="David Kim">
+                                <div class="status-indicator active"></div>
+                            </div>
+                            <div class="member-info">
+                                <h4>David Kim</h4>
+                                <p class="member-email">david.kim@company.com</p>
+                                <div class="member-role agent">Security Agent</div>
+                                <div class="member-meta">
+                                    <span>Last active: 1 hour ago</span>
+                                    <span>Joined: Mar 2024</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn" data-action="edit">Edit</button>
+                                <button class="action-btn" data-action="permissions">Permissions</button>
+                                <button class="action-btn danger" data-action="remove">Remove</button>
+                            </div>
+                        </div>
+
+                        <!-- Client Members -->
+                        <div class="member-card" data-role="client" data-status="active">
+                            <div class="member-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Lisa+Wang&background=d97706&color=fff" alt="Lisa Wang">
+                                <div class="status-indicator active"></div>
+                            </div>
+                            <div class="member-info">
+                                <h4>Lisa Wang</h4>
+                                <p class="member-email">lisa.wang@client.com</p>
+                                <div class="member-role client">Client</div>
+                                <div class="member-meta">
+                                    <span>Last active: 3 hours ago</span>
+                                    <span>Joined: Apr 2024</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn" data-action="edit">Edit</button>
+                                <button class="action-btn" data-action="permissions">Permissions</button>
+                                <button class="action-btn danger" data-action="remove">Remove</button>
+                            </div>
+                        </div>
+
+                        <div class="member-card" data-role="client" data-status="inactive">
+                            <div class="member-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Robert+Taylor&background=6b7280&color=fff" alt="Robert Taylor">
+                                <div class="status-indicator inactive"></div>
+                            </div>
+                            <div class="member-info">
+                                <h4>Robert Taylor</h4>
+                                <p class="member-email">robert.taylor@client.com</p>
+                                <div class="member-role client">Client</div>
+                                <div class="member-meta">
+                                    <span>Last active: 2 weeks ago</span>
+                                    <span>Joined: Jan 2024</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn" data-action="edit">Edit</button>
+                                <button class="action-btn" data-action="permissions">Permissions</button>
+                                <button class="action-btn danger" data-action="remove">Remove</button>
+                            </div>
+                        </div>
+
+                        <!-- Pending Invites -->
+                        <div class="member-card pending" data-role="agent" data-status="pending">
+                            <div class="member-avatar">
+                                <div class="avatar-placeholder">📧</div>
+                                <div class="status-indicator pending"></div>
+                            </div>
+                            <div class="member-info">
+                                <h4>Pending Invitation</h4>
+                                <p class="member-email">alex.martinez@company.com</p>
+                                <div class="member-role agent">Security Agent</div>
+                                <div class="member-meta">
+                                    <span>Invited: 2 days ago</span>
+                                    <span>Expires: 5 days</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn" data-action="resend">Resend</button>
+                                <button class="action-btn danger" data-action="cancel">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div class="member-card pending" data-role="client" data-status="pending">
+                            <div class="member-avatar">
+                                <div class="avatar-placeholder">📧</div>
+                                <div class="status-indicator pending"></div>
+                            </div>
+                            <div class="member-info">
+                                <h4>Pending Invitation</h4>
+                                <p class="member-email">jennifer.brown@client.com</p>
+                                <div class="member-role client">Client</div>
+                                <div class="member-meta">
+                                    <span>Invited: 1 day ago</span>
+                                    <span>Expires: 6 days</span>
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <button class="action-btn" data-action="resend">Resend</button>
+                                <button class="action-btn danger" data-action="cancel">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Permissions Matrix -->
+                <div class="permissions-section">
+                    <div class="permissions-header">
+                        <h2>Role Permissions</h2>
+                        <button id="editPermissions" class="btn-secondary">Edit Permissions</button>
+                    </div>
+                    
+                    <div class="permissions-table">
+                        <table class="permissions-matrix">
+                            <thead>
+                                <tr>
+                                    <th>Permission</th>
+                                    <th>Administrator</th>
+                                    <th>Security Agent</th>
+                                    <th>Client</th>
+                                    <th>Viewer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>View Dashboard</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Analyze Emails</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge limited">Limited</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                </tr>
+                                <tr>
+                                    <td>View History</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Manage Threats</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Generate Reports</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge limited">Limited</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Manage Integrations</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge limited">Limited</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Manage Team</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Billing & Plans</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                </tr>
+                                <tr>
+                                    <td>System Settings</td>
+                                    <td><span class="permission-badge granted">✓</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                    <td><span class="permission-badge denied">✗</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-section">
+                    <div class="activity-header">
+                        <h2>Recent Team Activity</h2>
+                        <div class="activity-filters">
+                            <select id="activityFilter" class="filter-select">
+                                <option value="all">All Activities</option>
+                                <option value="logins">Logins</option>
+                                <option value="invites">Invitations</option>
+                                <option value="permissions">Permission Changes</option>
+                                <option value="analysis">Analysis Actions</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-timeline">
+                        <div class="activity-item">
+                            <div class="activity-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Sarah+Johnson&background=4F709C&color=fff" alt="Sarah Johnson">
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Sarah Johnson</strong> invited <strong>alex.martinez@company.com</strong> as Security Agent
+                                </div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                            <div class="activity-type invite">Invite</div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Emily+Rodriguez&background=059669&color=fff" alt="Emily Rodriguez">
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Emily Rodriguez</strong> analyzed 15 suspicious emails
+                                </div>
+                                <div class="activity-time">4 hours ago</div>
+                            </div>
+                            <div class="activity-type analysis">Analysis</div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=4F709C&color=fff" alt="Michael Chen">
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Michael Chen</strong> updated permissions for <strong>David Kim</strong>
+                                </div>
+                                <div class="activity-time">1 day ago</div>
+                            </div>
+                            <div class="activity-type permissions">Permissions</div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-avatar">
+                                <img src="https://ui-avatars.com/api/?name=Lisa+Wang&background=d97706&color=fff" alt="Lisa Wang">
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Lisa Wang</strong> logged in from new device (Chrome on Windows)
+                                </div>
+                                <div class="activity-time">1 day ago</div>
+                            </div>
+                            <div class="activity-type login">Login</div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-avatar">
+                                <img src="https://ui-avatars.com/api/?name=David+Kim&background=059669&color=fff" alt="David Kim">
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>David Kim</strong> generated monthly security report
+                                </div>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                            <div class="activity-type analysis">Analysis</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Invite Member Modal -->
+            <div id="inviteModal" class="modal-overlay">
+                <div class="modal-content invite-modal">
+                    <div class="modal-header">
+                        <h2>Invite Team Member</h2>
+                        <button class="modal-close" onclick="closeInviteModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="invite-form">
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" id="inviteEmail" class="form-input" placeholder="Enter email address">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Role</label>
+                                <select id="inviteRole" class="form-select">
+                                    <option value="agent">Security Agent</option>
+                                    <option value="client">Client</option>
+                                    <option value="viewer">Viewer</option>
+                                    <option value="admin">Administrator</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Personal Message (Optional)</label>
+                                <textarea id="inviteMessage" class="form-textarea" placeholder="Add a personal message to the invitation..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Permissions</label>
+                                <div class="permissions-preview" id="permissionsPreview">
+                                    <!-- Dynamic permissions based on selected role -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" onclick="closeInviteModal()">Cancel</button>
+                        <button id="sendInvite" class="btn-primary">Send Invitation</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Member Modal -->
+            <div id="editMemberModal" class="modal-overlay">
+                <div class="modal-content edit-member-modal">
+                    <div class="modal-header">
+                        <h2>Edit Team Member</h2>
+                        <button class="modal-close" onclick="closeEditMemberModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="edit-member-form">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="editMemberName" class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="editMemberEmail" class="form-input" readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Role</label>
+                                <select id="editMemberRole" class="form-select">
+                                    <option value="admin">Administrator</option>
+                                    <option value="agent">Security Agent</option>
+                                    <option value="client">Client</option>
+                                    <option value="viewer">Viewer</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="editMemberStatus" class="form-select">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" onclick="closeEditMemberModal()">Cancel</button>
+                        <button id="saveMemberChanges" class="btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Google API Client -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- Gmail Configuration -->
+    <script src="gmail-config.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="dashboard.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>
+

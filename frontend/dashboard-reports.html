@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=41">
+    <style>
+        .dash-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .dash-sidebar { background:#1a2a48; border-right:1px solid rgba(255,255,255,0.14); padding:18px; position:sticky; top:0; height:100vh; }
+        .dash-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; letter-spacing:.2px; }
+        .dash-nav { margin-top:18px; display:flex; flex-direction:column; gap:4px; }
+        .dash-link { color:#EAF1FB; padding:10px 12px; border-radius:10px; text-decoration:none; display:flex; align-items:center; gap:10px; border:1px solid transparent; }
+        .dash-link:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); }
+        .dash-link.active { background:rgba(255,255,255,0.10); border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.35) inset; color:#fff; }
+        .dash-hero { background:#213555; border-bottom:1px solid rgba(255,255,255,0.14); padding:24px 24px; color:#fff; }
+        .dash-hero .subtitle { color:#EAF1FB; opacity:.95; margin-top:6px; }
+        @media (max-width: 900px){ .dash-shell{ grid-template-columns: 1fr; } .dash-sidebar{ display:none; } }
+
+        /* Reports page scoped styles */
+        .report-builder-section, .report-preview-section, .quick-reports-section, .scheduled-reports-section, .report-history-section{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:24px; margin-bottom:24px; }
+        .builder-header, .preview-header, .scheduled-header, .history-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+        .builder-header h2, .preview-header h2, .scheduled-header h2, .history-header h2, .quick-reports-section h2{ color:#fff; margin:0; font-size:1.5rem; }
+        .builder-actions, .preview-actions{ display:flex; gap:12px; }
+        .btn-primary{ background:#4F709C; color:#fff; border:1px solid #4F709C; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+        .btn-secondary{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+        .btn-primary:hover{ background:#3a5a80; border-color:#3a5a80; }
+        .btn-secondary:hover{ background:rgba(255,255,255,0.12); }
+
+        .builder-controls{ display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; }
+        .control-group{ display:flex; flex-direction:column; gap:8px; }
+        .control-group label{ color:#EAF1FB; font-weight:600; font-size:.9rem; }
+        .control-select{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:10px 12px; }
+        .checkbox-group{ display:flex; flex-direction:column; gap:8px; }
+        .checkbox-item{ display:flex; align-items:center; gap:8px; color:#EAF1FB; cursor:pointer; }
+        .checkbox-item input[type="checkbox"]{ width:16px; height:16px; }
+
+        .report-preview{ background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; min-height:400px; padding:20px; }
+        .preview-placeholder{ display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; color:#9fb4d3; }
+        .placeholder-icon{ font-size:4rem; margin-bottom:16px; }
+        .preview-placeholder h3{ color:#fff; margin:0 0 8px 0; }
+        .preview-placeholder p{ margin:0; opacity:0.8; }
+
+        .quick-reports-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; }
+        .quick-report-card{ background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:20px; text-align:center; transition:all 0.3s ease; }
+        .quick-report-card:hover{ background:rgba(255,255,255,0.1); border-color:rgba(79,112,156,0.4); transform:translateY(-2px); }
+        .report-icon{ font-size:2.5rem; margin-bottom:12px; }
+        .quick-report-card h3{ color:#fff; margin:0 0 8px 0; font-size:1.2rem; }
+        .quick-report-card p{ color:#9fb4d3; margin:0 0 16px 0; font-size:.9rem; }
+        .quick-report-btn{ background:#4F709C; color:#fff; border:1px solid #4F709C; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:600; }
+        .quick-report-btn:hover{ background:#3a5a80; }
+
+        .scheduled-reports-table{ overflow-x:auto; }
+        .reports-table{ width:100%; border-collapse:collapse; }
+        .reports-table th{ background:rgba(255,255,255,0.08); color:#EAF1FB; padding:12px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); font-weight:600; }
+        .reports-table td{ padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); color:#EAF1FB; }
+        .reports-table tbody tr:hover{ background:rgba(255,255,255,0.04); }
+        .status-badge{ padding:4px 8px; border-radius:999px; font-size:.8rem; font-weight:600; text-transform:uppercase; }
+        .status-badge.active{ background:rgba(16,185,129,0.2); color:#6ee7b7; }
+        .status-badge.paused{ background:rgba(245,158,11,0.2); color:#fcd34d; }
+        .table-actions{ display:flex; gap:6px; }
+        .action-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:4px; padding:4px 8px; cursor:pointer; font-size:.8rem; }
+        .action-btn.danger{ background:rgba(220,38,38,0.2); color:#fca5a5; border-color:rgba(220,38,38,0.4); }
+
+        .history-filters{ display:flex; gap:12px; align-items:center; }
+        .report-history-list{ display:flex; flex-direction:column; gap:12px; }
+        .history-item{ background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:16px; display:flex; align-items:center; gap:16px; }
+        .history-item.failed{ border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.05); }
+        .history-icon{ font-size:1.5rem; }
+        .history-content{ flex:1; }
+        .history-title{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .history-details{ color:#9fb4d3; font-size:.9rem; }
+        .history-actions{ display:flex; gap:8px; }
+        .history-action-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:4px; padding:6px 10px; cursor:pointer; font-size:.8rem; }
+
+        /* Schedule Modal */
+        .modal-overlay{ position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:1000; }
+        .schedule-modal{ background:#213555; border:1px solid rgba(255,255,255,0.2); border-radius:12px; max-width:600px; width:90vw; max-height:90vh; overflow:hidden; }
+        .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .modal-header h2{ color:#fff; margin:0; }
+        .modal-close{ background:none; border:none; color:#EAF1FB; font-size:1.5rem; cursor:pointer; }
+        .modal-body{ padding:20px; max-height:60vh; overflow-y:auto; }
+        .schedule-form{ display:flex; flex-direction:column; gap:16px; }
+        .form-group{ display:flex; flex-direction:column; gap:6px; }
+        .form-group label{ color:#EAF1FB; font-weight:600; font-size:.9rem; }
+        .form-input, .form-select, .form-textarea{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:10px 12px; }
+        .form-textarea{ min-height:80px; resize:vertical; }
+        .modal-footer{ display:flex; gap:12px; padding:20px; border-top:1px solid rgba(255,255,255,0.1); justify-content:flex-end; }
+
+        /* Report Content Styles */
+        .report-content{ background:#fff; color:#333; padding:40px; font-family:'Inter', sans-serif; line-height:1.6; }
+        .report-header{ text-align:center; margin-bottom:40px; border-bottom:2px solid #4F709C; padding-bottom:20px; }
+        .report-title{ color:#213555; font-size:2rem; font-weight:700; margin:0 0 8px 0; }
+        .report-subtitle{ color:#6b7280; font-size:1.1rem; margin:0; }
+        .report-section{ margin-bottom:32px; }
+        .section-title{ color:#213555; font-size:1.4rem; font-weight:600; margin:0 0 16px 0; border-left:4px solid #4F709C; padding-left:12px; }
+        .metric-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px; }
+        .metric-card{ background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; text-align:center; }
+        .metric-value{ font-size:2rem; font-weight:700; color:#4F709C; margin-bottom:4px; }
+        .metric-label{ color:#6b7280; font-size:.9rem; }
+        .chart-container{ background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:20px; margin:16px 0; }
+        .recommendations-list{ list-style:none; padding:0; }
+        .recommendation-item{ background:#f0f9ff; border-left:4px solid #0ea5e9; padding:12px 16px; margin-bottom:8px; border-radius:0 6px 6px 0; }
+        .recommendation-priority{ font-weight:600; color:#0ea5e9; font-size:.8rem; text-transform:uppercase; }
+
+        @media (max-width: 768px){
+            .builder-controls{ grid-template-columns:1fr; }
+            .quick-reports-grid{ grid-template-columns:1fr; }
+            .builder-header, .preview-header, .scheduled-header, .history-header{ flex-direction:column; align-items:stretch; gap:12px; }
+            .builder-actions, .preview-actions{ justify-content:stretch; }
+            .history-item{ flex-direction:column; align-items:stretch; text-align:center; }
+            .history-actions{ justify-content:center; }
+        }
+    </style>
+</head>
+<body class="dashboard-modern">
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">Phishing Detection AI</div>
+            <nav class="dash-nav">
+                <a class="dash-link" href="dashboard.html">Overview</a>
+                <a class="dash-link" href="dashboard-analysis.html">Analysis</a>
+                <a class="dash-link" href="dashboard-history.html">History</a>
+                <a class="dash-link" href="dashboard-threats.html">Threats</a>
+                <a class="dash-link active" href="dashboard-reports.html">Reports</a>
+                <a class="dash-link" href="dashboard-integrations.html">Integrations</a>
+                <a class="dash-link" href="dashboard-team.html">Team</a>
+                <a class="dash-link" href="dashboard-plan.html">Plan & Billing</a>
+                <a class="dash-link" href="dashboard-settings.html">Settings</a>
+                <a class="dash-link" href="updates.html">Support</a>
+            </nav>
+        </aside>
+        <div>
+            <div class="dash-hero">
+                <h1 style="margin:0">Reports & Export</h1>
+                <div class="subtitle">Create shareable reports and export your findings.</div>
+            </div>
+            <main class="dashboard-main" style="padding: 24px;">
+                <!-- Report Builder Section -->
+                <div class="report-builder-section">
+                    <div class="builder-header">
+                        <h2>Report Builder</h2>
+                        <div class="builder-actions">
+                            <button id="generateReport" class="btn-primary">Generate Report</button>
+                            <button id="saveTemplate" class="btn-secondary">Save Template</button>
+                        </div>
+                    </div>
+                    
+                    <div class="builder-controls">
+                        <div class="control-group">
+                            <label>Report Template</label>
+                            <select id="reportTemplate" class="control-select">
+                                <option value="security-summary">Security Summary</option>
+                                <option value="threat-analysis">Threat Analysis</option>
+                                <option value="compliance-report">Compliance Report</option>
+                                <option value="executive-dashboard">Executive Dashboard</option>
+                                <option value="custom">Custom Report</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Date Range</label>
+                            <select id="dateRange" class="control-select">
+                                <option value="last-7-days">Last 7 Days</option>
+                                <option value="last-30-days">Last 30 Days</option>
+                                <option value="last-90-days">Last 90 Days</option>
+                                <option value="this-month">This Month</option>
+                                <option value="last-month">Last Month</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Export Format</label>
+                            <select id="exportFormat" class="control-select">
+                                <option value="pdf">PDF Report</option>
+                                <option value="csv">CSV Data</option>
+                                <option value="excel">Excel Workbook</option>
+                                <option value="json">JSON Data</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Include Sections</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="includeOverview" checked>
+                                    <span>Executive Overview</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="includeThreats" checked>
+                                    <span>Threat Analysis</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="includeStats" checked>
+                                    <span>Statistics & Metrics</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="includeCharts" checked>
+                                    <span>Charts & Graphs</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="includeRecommendations">
+                                    <span>Recommendations</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Preview Section -->
+                <div class="report-preview-section">
+                    <div class="preview-header">
+                        <h2>Report Preview</h2>
+                        <div class="preview-actions">
+                            <button id="refreshPreview" class="btn-secondary">Refresh Preview</button>
+                            <button id="fullscreenPreview" class="btn-secondary">Fullscreen</button>
+                        </div>
+                    </div>
+                    
+                    <div id="reportPreview" class="report-preview">
+                        <!-- Report content will be generated here -->
+                        <div class="preview-placeholder">
+                            <div class="placeholder-icon">📊</div>
+                            <h3>Report Preview</h3>
+                            <p>Configure your report settings above and click "Generate Report" to see a preview.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Reports Section -->
+                <div class="quick-reports-section">
+                    <h2>Quick Reports</h2>
+                    <div class="quick-reports-grid">
+                        <div class="quick-report-card" data-template="daily-summary">
+                            <div class="report-icon">📈</div>
+                            <h3>Daily Summary</h3>
+                            <p>Today's threat activity and key metrics</p>
+                            <button class="quick-report-btn">Generate</button>
+                        </div>
+                        
+                        <div class="quick-report-card" data-template="weekly-trends">
+                            <div class="report-icon">📊</div>
+                            <h3>Weekly Trends</h3>
+                            <p>7-day threat patterns and analysis</p>
+                            <button class="quick-report-btn">Generate</button>
+                        </div>
+                        
+                        <div class="quick-report-card" data-template="security-posture">
+                            <div class="report-icon">🛡️</div>
+                            <h3>Security Posture</h3>
+                            <p>Overall security health assessment</p>
+                            <button class="quick-report-btn">Generate</button>
+                        </div>
+                        
+                        <div class="quick-report-card" data-template="compliance-check">
+                            <div class="report-icon">✅</div>
+                            <h3>Compliance Check</h3>
+                            <p>Regulatory compliance status</p>
+                            <button class="quick-report-btn">Generate</button>
+                        </div>
+                        
+                        <div class="quick-report-card" data-template="incident-response">
+                            <div class="report-icon">🚨</div>
+                            <h3>Incident Response</h3>
+                            <p>Recent incidents and response times</p>
+                            <button class="quick-report-btn">Generate</button>
+                        </div>
+                        
+                        <div class="quick-report-card" data-template="executive-brief">
+                            <div class="report-icon">👔</div>
+                            <h3>Executive Brief</h3>
+                            <p>High-level summary for leadership</p>
+                            <button class="quick-report-btn">Generate</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scheduled Reports Section -->
+                <div class="scheduled-reports-section">
+                    <div class="scheduled-header">
+                        <h2>Scheduled Reports</h2>
+                        <button id="addScheduledReport" class="btn-primary">Add Schedule</button>
+                    </div>
+                    
+                    <div class="scheduled-reports-table">
+                        <table class="reports-table">
+                            <thead>
+                                <tr>
+                                    <th>Report Name</th>
+                                    <th>Template</th>
+                                    <th>Frequency</th>
+                                    <th>Recipients</th>
+                                    <th>Next Run</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduledReportsBody">
+                                <tr>
+                                    <td>Weekly Security Report</td>
+                                    <td>Security Summary</td>
+                                    <td>Weekly (Monday)</td>
+                                    <td>security@company.com</td>
+                                    <td>Oct 28, 2024 9:00 AM</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="action-btn">Edit</button>
+                                            <button class="action-btn">Pause</button>
+                                            <button class="action-btn danger">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Monthly Compliance</td>
+                                    <td>Compliance Report</td>
+                                    <td>Monthly (1st)</td>
+                                    <td>compliance@company.com</td>
+                                    <td>Nov 1, 2024 8:00 AM</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="action-btn">Edit</button>
+                                            <button class="action-btn">Pause</button>
+                                            <button class="action-btn danger">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Executive Dashboard</td>
+                                    <td>Executive Dashboard</td>
+                                    <td>Daily (9:00 AM)</td>
+                                    <td>executives@company.com</td>
+                                    <td>Tomorrow 9:00 AM</td>
+                                    <td><span class="status-badge paused">Paused</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="action-btn">Edit</button>
+                                            <button class="action-btn">Resume</button>
+                                            <button class="action-btn danger">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Report History Section -->
+                <div class="report-history-section">
+                    <div class="history-header">
+                        <h2>Report History</h2>
+                        <div class="history-filters">
+                            <select id="historyFilter" class="control-select">
+                                <option value="all">All Reports</option>
+                                <option value="generated">Generated</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                            <button id="clearHistory" class="btn-secondary">Clear History</button>
+                        </div>
+                    </div>
+                    
+                    <div class="report-history-list" id="reportHistoryList">
+                        <div class="history-item">
+                            <div class="history-icon">📊</div>
+                            <div class="history-content">
+                                <div class="history-title">Security Summary Report</div>
+                                <div class="history-details">Generated on Oct 25, 2024 at 2:30 PM • PDF • 2.4 MB</div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="history-action-btn">Download</button>
+                                <button class="history-action-btn">Share</button>
+                                <button class="history-action-btn">Delete</button>
+                            </div>
+                        </div>
+                        
+                        <div class="history-item">
+                            <div class="history-icon">📈</div>
+                            <div class="history-content">
+                                <div class="history-title">Weekly Trends Analysis</div>
+                                <div class="history-details">Generated on Oct 24, 2024 at 10:15 AM • Excel • 1.8 MB</div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="history-action-btn">Download</button>
+                                <button class="history-action-btn">Share</button>
+                                <button class="history-action-btn">Delete</button>
+                            </div>
+                        </div>
+                        
+                        <div class="history-item">
+                            <div class="history-icon">🛡️</div>
+                            <div class="history-content">
+                                <div class="history-title">Compliance Report</div>
+                                <div class="history-details">Generated on Oct 23, 2024 at 4:45 PM • PDF • 3.1 MB</div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="history-action-btn">Download</button>
+                                <button class="history-action-btn">Share</button>
+                                <button class="history-action-btn">Delete</button>
+                            </div>
+                        </div>
+                        
+                        <div class="history-item failed">
+                            <div class="history-icon">❌</div>
+                            <div class="history-content">
+                                <div class="history-title">Executive Dashboard</div>
+                                <div class="history-details">Failed on Oct 22, 2024 at 9:00 AM • Error: Insufficient data</div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="history-action-btn">Retry</button>
+                                <button class="history-action-btn">View Error</button>
+                                <button class="history-action-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Schedule Report Modal -->
+            <div id="scheduleModal" class="modal-overlay">
+                <div class="modal-content schedule-modal">
+                    <div class="modal-header">
+                        <h2>Schedule Report</h2>
+                        <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="schedule-form">
+                            <div class="form-group">
+                                <label>Report Name</label>
+                                <input type="text" id="scheduleName" class="form-input" placeholder="Enter report name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Template</label>
+                                <select id="scheduleTemplate" class="form-select">
+                                    <option value="security-summary">Security Summary</option>
+                                    <option value="threat-analysis">Threat Analysis</option>
+                                    <option value="compliance-report">Compliance Report</option>
+                                    <option value="executive-dashboard">Executive Dashboard</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Frequency</label>
+                                <select id="scheduleFrequency" class="form-select">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Time</label>
+                                <input type="time" id="scheduleTime" class="form-input" value="09:00">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Recipients (comma-separated emails)</label>
+                                <textarea id="scheduleRecipients" class="form-textarea" placeholder="user1@company.com, user2@company.com"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Format</label>
+                                <select id="scheduleFormat" class="form-select">
+                                    <option value="pdf">PDF</option>
+                                    <option value="excel">Excel</option>
+                                    <option value="csv">CSV</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" onclick="closeScheduleModal()">Cancel</button>
+                        <button id="saveSchedule" class="btn-primary">Save Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Google API Client -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- Gmail Configuration -->
+    <script src="gmail-config.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="dashboard.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>
+

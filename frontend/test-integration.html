@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Phishing Detection AI - API Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Backend Health Check</h2>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="healthResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Email Analysis Test</h2>
+        <button onclick="testAnalysis()">Test Analysis Endpoint</button>
+        <div id="analysisResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>History API Test</h2>
+        <button onclick="testHistory()">Test History Endpoints</button>
+        <div id="historyResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Threats API Test</h2>
+        <button onclick="testThreats()">Test Threats Endpoints</button>
+        <div id="threatsResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Reports API Test</h2>
+        <button onclick="testReports()">Test Reports Endpoints</button>
+        <div id="reportsResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Team API Test</h2>
+        <button onclick="testTeam()">Test Team Endpoints</button>
+        <div id="teamResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Integrations API Test</h2>
+        <button onclick="testIntegrations()">Test Integrations Endpoints</button>
+        <div id="integrationsResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Billing API Test</h2>
+        <button onclick="testBilling()">Test Billing Endpoints</button>
+        <div id="billingResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        const TEST_USER_ID = 'test-user-123';
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('healthResult');
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Health Check Passed</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Health Check Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testAnalysis() {
+            const resultDiv = document.getElementById('analysisResult');
+            try {
+                const testEmail = `Subject: Urgent Account Verification Required
+From: security@fake-bank.com
+To: user@example.com
+
+Dear Customer,
+
+Your account has been temporarily suspended due to suspicious activity. 
+Please click the link below to verify your identity immediately:
+
+http://suspicious-bank-login.com/verify
+
+Failure to verify within 24 hours will result in permanent account closure.
+
+Best regards,
+Security Team`;
+
+                const response = await fetch(`${API_BASE}/api/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email_text: testEmail,
+                        user_id: TEST_USER_ID 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Analysis Test Passed</h3>
+                    <p><strong>Risk Level:</strong> ${data.level}</p>
+                    <p><strong>Risk Score:</strong> ${data.score}</p>
+                    <p><strong>Reason:</strong> ${data.reason}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Analysis Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testHistory() {
+            const resultDiv = document.getElementById('historyResult');
+            try {
+                // Test getting history
+                const historyResponse = await fetch(`${API_BASE}/api/history?user_id=${TEST_USER_ID}&limit=10`);
+                const historyData = await historyResponse.json();
+                
+                // Test getting history stats
+                const statsResponse = await fetch(`${API_BASE}/api/history/stats?user_id=${TEST_USER_ID}`);
+                const statsData = await statsResponse.json();
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ History API Test Passed</h3>
+                    <p><strong>History Items:</strong> ${historyData.length}</p>
+                    <p><strong>Total Count:</strong> ${statsData.total_count}</p>
+                    <p><strong>High Risk:</strong> ${statsData.high_risk_count}</p>
+                    <p><strong>Medium Risk:</strong> ${statsData.medium_risk_count}</p>
+                    <p><strong>Low Risk:</strong> ${statsData.low_risk_count}</p>
+                    <details>
+                        <summary>View Full Response</summary>
+                        <pre>${JSON.stringify({history: historyData, stats: statsData}, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ History API Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testThreats() {
+            const resultDiv = document.getElementById('threatsResult');
+            try {
+                // Test getting threats
+                const threatsResponse = await fetch(`${API_BASE}/api/threats?user_id=${TEST_USER_ID}&limit=10`);
+                const threatsData = await threatsResponse.json();
+                
+                // Test getting threat stats
+                const statsResponse = await fetch(`${API_BASE}/api/threats/stats?user_id=${TEST_USER_ID}`);
+                const statsData = await statsResponse.json();
+                
+                // Test getting threat feed
+                const feedResponse = await fetch(`${API_BASE}/api/threats/feed?limit=5`);
+                const feedData = await feedResponse.json();
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Threats API Test Passed</h3>
+                    <p><strong>Threats:</strong> ${threatsData.length}</p>
+                    <p><strong>Total Threats:</strong> ${statsData.total_threats}</p>
+                    <p><strong>Active Threats:</strong> ${statsData.active_threats}</p>
+                    <p><strong>Feed Items:</strong> ${feedData.length}</p>
+                    <details>
+                        <summary>View Full Response</summary>
+                        <pre>${JSON.stringify({threats: threatsData, stats: statsData, feed: feedData}, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Threats API Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testReports() {
+            const resultDiv = document.getElementById('reportsResult');
+            try {
+                // Test getting reports
+                const reportsResponse = await fetch(`${API_BASE}/api/reports?user_id=${TEST_USER_ID}&limit=10`);
+                const reportsData = await reportsResponse.json();
+                
+                // Test getting report stats
+                const statsResponse = await fetch(`${API_BASE}/api/reports/stats?user_id=${TEST_USER_ID}`);
+                const statsData = await statsResponse.json();
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Reports API Test Passed</h3>
+                    <p><strong>Reports:</strong> ${reportsData.length}</p>
+                    <p><strong>Total Reports:</strong> ${statsData.total_reports}</p>
+                    <p><strong>Completed:</strong> ${statsData.completed_reports}</p>
+                    <p><strong>Failed:</strong> ${statsData.failed_reports}</p>
+                    <details>
+                        <summary>View Full Response</summary>
+                        <pre>${JSON.stringify({reports: reportsData, stats: statsData}, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Reports API Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testTeam() {
+            const resultDiv = document.getElementById('teamResult');
+            try {
+                // Test getting team members
+                const membersResponse = await fetch(`${API_BASE}/api/team/members?organization_id=${TEST_USER_ID}&limit=10`);
+                const membersData = await membersResponse.json();
+                
+                // Test getting team stats
+                const statsResponse = await fetch(`${API_BASE}/api/team/stats?organization_id=${TEST_USER_ID}`);
+                const statsData = await statsResponse.json();
+                
+                // Test getting role permissions
+                const rolesResponse = await fetch(`${API_BASE}/api/team/roles`);
+                const rolesData = await rolesResponse.json();
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Team API Test Passed</h3>
+                    <p><strong>Team Members:</strong> ${membersData.length}</p>
+                    <p><strong>Total Members:</strong> ${statsData.total_members}</p>
+                    <p><strong>Active Members:</strong> ${statsData.active_members}</p>
+                    <p><strong>Available Roles:</strong> ${rolesData.length}</p>
+                    <details>
+                        <summary>View Full Response</summary>
+                        <pre>${JSON.stringify({members: membersData, stats: statsData, roles: rolesData}, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Team API Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testIntegrations() {
+            const resultDiv = document.getElementById('integrationsResult');
+            try {
+                // Test getting integrations
+                const integrationsResponse = await fetch(`${API_BASE}/api/integrations?user_id=${TEST_USER_ID}`);
+                const integrationsData = await integrationsResponse.json();
+                
+                // Test getting integration stats
+                const statsResponse = await fetch(`${API_BASE}/api/integrations/stats?user_id=${TEST_USER_ID}`);
+                const statsData = await statsResponse.json();
+                
+                // Test getting integration health
+                const healthResponse = await fetch(`${API_BASE}/api/integrations/health?user_id=${TEST_USER_ID}`);
+                const healthData = await healthResponse.json();
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Integrations API Test Passed</h3>
+                    <p><strong>Integrations:</strong> ${integrationsData.length}</p>
+                    <p><strong>Active Integrations:</strong> ${statsData.active_integrations}</p>
+                    <p><strong>Healthy Integrations:</strong> ${statsData.healthy_integrations}</p>
+                    <p><strong>API Calls Today:</strong> ${statsData.api_calls_today}</p>
+                    <details>
+                        <summary>View Full Response</summary>
+                        <pre>${JSON.stringify({integrations: integrationsData, stats: statsData, health: healthData}, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Integrations API Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testBilling() {
+            const resultDiv = document.getElementById('billingResult');
+            try {
+                // Test getting user subscription
+                const subscriptionResponse = await fetch(`${API_BASE}/api/billing/subscriptions/${TEST_USER_ID}`);
+                const subscriptionData = await subscriptionResponse.json();
+                
+                // Test getting available plans
+                const plansResponse = await fetch(`${API_BASE}/api/billing/plans`);
+                const plansData = await plansResponse.json();
+                
+                // Test getting usage analytics
+                const usageResponse = await fetch(`${API_BASE}/api/billing/usage/${TEST_USER_ID}?period=current`);
+                const usageData = await usageResponse.json();
+                
+                // Test getting billing settings
+                const settingsResponse = await fetch(`${API_BASE}/api/billing/settings/${TEST_USER_ID}`);
+                const settingsData = await settingsResponse.json();
+                
+                // Test getting invoices
+                const invoicesResponse = await fetch(`${API_BASE}/api/billing/invoices?user_id=${TEST_USER_ID}&limit=5`);
+                const invoicesData = await invoicesResponse.json();
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Billing API Test Passed</h3>
+                    <p><strong>Current Plan:</strong> ${subscriptionData.plan_name} (${subscriptionData.plan_type})</p>
+                    <p><strong>Plan Status:</strong> ${subscriptionData.status}</p>
+                    <p><strong>Available Plans:</strong> ${plansData.length}</p>
+                    <p><strong>Usage Metrics:</strong> ${usageData.metrics.length}</p>
+                    <p><strong>Invoices:</strong> ${invoicesData.length}</p>
+                    <p><strong>Billing Email:</strong> ${settingsData.billing_email}</p>
+                    <details>
+                        <summary>View Full Response</summary>
+                        <pre>${JSON.stringify({
+                            subscription: subscriptionData, 
+                            plans: plansData, 
+                            usage: usageData,
+                            settings: settingsData,
+                            invoices: invoicesData
+                        }, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Billing API Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Auto-run health check on page load
+        window.addEventListener('load', testHealth);
+    </script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

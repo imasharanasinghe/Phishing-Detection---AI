@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threats - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=41">
+    <style>
+        .dash-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .dash-sidebar { background:#1a2a48; border-right:1px solid rgba(255,255,255,0.14); padding:18px; position:sticky; top:0; height:100vh; }
+        .dash-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; letter-spacing:.2px; }
+        .dash-nav { margin-top:18px; display:flex; flex-direction:column; gap:4px; }
+        .dash-link { color:#EAF1FB; padding:10px 12px; border-radius:10px; text-decoration:none; display:flex; align-items:center; gap:10px; border:1px solid transparent; }
+        .dash-link:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); }
+        .dash-link.active { background:rgba(255,255,255,0.10); border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.35) inset; color:#fff; }
+        .dash-hero { background:#213555; border-bottom:1px solid rgba(255,255,255,0.14); padding:24px 24px; color:#fff; }
+        .dash-hero .subtitle { color:#EAF1FB; opacity:.95; margin-top:6px; }
+        @media (max-width: 900px){ .dash-shell{ grid-template-columns: 1fr; } .dash-sidebar{ display:none; } }
+
+        /* Threats page scoped styles */
+        .threat-status-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:16px; margin-bottom:24px; }
+        .status-card{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:20px; display:flex; align-items:center; gap:16px; position:relative; overflow:hidden; }
+        .status-card::before{ content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+        .status-card.critical::before{ background:#dc2626; }
+        .status-card.high::before{ background:#ea580c; }
+        .status-card.medium::before{ background:#d97706; }
+        .status-card.blocked::before{ background:#059669; }
+        .status-icon{ font-size:2rem; }
+        .status-content{ flex:1; }
+        .status-number{ font-size:2rem; font-weight:700; color:#fff; margin-bottom:4px; }
+        .status-label{ color:#9fb4d3; font-size:.9rem; }
+        .status-trend{ color:#6ee7b7; font-size:.8rem; font-weight:600; }
+
+        .threat-feed-container{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:20px; margin-bottom:24px; }
+        .threat-feed-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .threat-feed-header h2{ color:#fff; margin:0; }
+        .feed-controls{ display:flex; align-items:center; gap:12px; }
+        .feed-control-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:6px 12px; cursor:pointer; }
+        .feed-status{ display:flex; align-items:center; gap:6px; color:#EAF1FB; font-size:.9rem; }
+        .status-dot{ width:8px; height:8px; border-radius:50%; }
+        .status-dot.live{ background:#10b981; animation:pulse 2s infinite; }
+        @keyframes pulse{ 0%, 100%{ opacity:1; } 50%{ opacity:0.5; } }
+        .threat-feed{ max-height:300px; overflow-y:auto; }
+        .feed-item{ background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:12px; margin-bottom:8px; display:flex; align-items:center; gap:12px; }
+        .feed-item-icon{ font-size:1.2rem; }
+        .feed-item-content{ flex:1; }
+        .feed-item-title{ color:#fff; font-weight:600; margin-bottom:2px; }
+        .feed-item-details{ color:#9fb4d3; font-size:.85rem; }
+        .feed-item-time{ color:#6b7280; font-size:.8rem; }
+
+        .threats-dashboard-grid{ display:grid; grid-template-columns:2fr 1fr; gap:24px; margin-bottom:24px; }
+        .panel{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:20px; }
+        .panel-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .panel-header h3{ color:#fff; margin:0; }
+        .pattern-legend{ display:flex; gap:16px; }
+        .legend-item{ display:flex; align-items:center; gap:6px; color:#EAF1FB; font-size:.9rem; }
+        .legend-dot{ width:10px; height:10px; border-radius:50%; }
+        .legend-dot.phishing{ background:#dc2626; }
+        .legend-dot.malware{ background:#ea580c; }
+        .legend-dot.spam{ background:#d97706; }
+        .timeline-container{ position:relative; height:200px; }
+
+        .intel-update-btn{ background:#4F709C; color:#fff; border:1px solid #4F709C; border-radius:6px; padding:6px 12px; cursor:pointer; }
+        .intel-content{ display:flex; flex-direction:column; gap:12px; }
+        .intel-item{ display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.04); border-radius:8px; padding:12px; }
+        .intel-source{ color:#fff; font-weight:600; }
+        .intel-status{ padding:4px 8px; border-radius:999px; font-size:.8rem; font-weight:600; }
+        .intel-status.connected{ background:rgba(16,185,129,0.2); color:#6ee7b7; }
+        .intel-status.disconnected{ background:rgba(239,68,68,0.2); color:#fca5a5; }
+        .intel-last-update{ color:#9fb4d3; font-size:.85rem; }
+
+        .threats-table-panel{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:20px; }
+        .threats-table-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:16px; }
+        .threats-table-header h2{ color:#fff; margin:0; }
+        .table-controls{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+        .threat-filters{ display:flex; gap:8px; }
+        .threat-filter-select{ background:rgba(255,255,255,0.06); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:6px 10px; }
+        .table-actions{ display:flex; gap:8px; }
+        .action-btn{ padding:8px 12px; border-radius:6px; cursor:pointer; border:1px solid; font-weight:600; }
+        .action-btn.danger{ background:rgba(220,38,38,0.2); color:#fca5a5; border-color:rgba(220,38,38,0.4); }
+        .action-btn.secondary{ background:rgba(255,255,255,0.08); color:#EAF1FB; border-color:rgba(255,255,255,0.18); }
+
+        .threats-table-container{ overflow-x:auto; }
+        .threats-table{ width:100%; border-collapse:collapse; }
+        .threats-table th{ background:rgba(255,255,255,0.08); color:#EAF1FB; padding:12px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); font-weight:600; }
+        .threats-table td{ padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); color:#EAF1FB; }
+        .threats-table tbody tr:hover{ background:rgba(255,255,255,0.04); }
+        .threat-name{ color:#fff; font-weight:600; }
+        .severity-badge{ padding:4px 8px; border-radius:999px; font-size:.8rem; font-weight:600; text-transform:uppercase; }
+        .severity-badge.critical{ background:rgba(220,38,38,0.2); color:#fca5a5; }
+        .severity-badge.high{ background:rgba(234,88,12,0.2); color:#fdba74; }
+        .severity-badge.medium{ background:rgba(217,119,6,0.2); color:#fcd34d; }
+        .severity-badge.low{ background:rgba(5,150,105,0.2); color:#6ee7b7; }
+        .threat-type{ color:#9fb4d3; }
+        .threat-source{ color:#6b7280; font-size:.9rem; }
+        .threat-status{ padding:4px 8px; border-radius:999px; font-size:.8rem; font-weight:600; }
+        .threat-status.active{ background:rgba(239,68,68,0.2); color:#fca5a5; }
+        .threat-status.investigating{ background:rgba(245,158,11,0.2); color:#fcd34d; }
+        .threat-status.resolved{ background:rgba(5,150,105,0.2); color:#6ee7b7; }
+        .threat-status.blocked{ background:rgba(75,85,99,0.2); color:#9ca3af; }
+        .threat-actions{ display:flex; gap:6px; }
+        .threat-action-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:4px; padding:4px 8px; cursor:pointer; font-size:.8rem; }
+
+        /* Threat Modal */
+        .modal-overlay{ position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:1000; }
+        .threat-modal{ background:#213555; border:1px solid rgba(255,255,255,0.2); border-radius:12px; max-width:800px; width:90vw; max-height:90vh; overflow:hidden; }
+        .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .modal-header h2{ color:#fff; margin:0; }
+        .modal-close{ background:none; border:none; color:#EAF1FB; font-size:1.5rem; cursor:pointer; }
+        .modal-body{ padding:20px; max-height:60vh; overflow-y:auto; }
+        .threat-details-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+        .threat-overview{ grid-column:1/-1; }
+        .threat-severity-badge{ display:inline-block; padding:6px 12px; border-radius:999px; font-size:.9rem; font-weight:700; text-transform:uppercase; margin-bottom:12px; }
+        .threat-severity-badge.critical{ background:rgba(220,38,38,0.2); color:#fca5a5; }
+        .threat-severity-badge.high{ background:rgba(234,88,12,0.2); color:#fdba74; }
+        .threat-overview h3{ color:#fff; margin:0 0 8px 0; }
+        .threat-overview p{ color:#9fb4d3; margin-bottom:16px; }
+        .threat-metadata{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; }
+        .metadata-item{ color:#EAF1FB; }
+        .metadata-item strong{ color:#fff; }
+        .ioc-list, .timeline, .recommendations-list{ background:rgba(255,255,255,0.04); border-radius:8px; padding:12px; }
+        .ioc-item{ background:rgba(255,255,255,0.06); border-radius:6px; padding:8px; margin-bottom:6px; font-family:monospace; font-size:.9rem; color:#EAF1FB; }
+        .timeline-item{ border-left:2px solid #4F709C; padding-left:12px; margin-bottom:12px; }
+        .timeline-time{ color:#9fb4d3; font-size:.85rem; }
+        .timeline-event{ color:#fff; font-weight:600; margin:4px 0; }
+        .timeline-details{ color:#EAF1FB; font-size:.9rem; }
+        .recommendation-item{ background:rgba(79,112,156,0.1); border:1px solid rgba(79,112,156,0.3); border-radius:6px; padding:10px; margin-bottom:8px; }
+        .recommendation-priority{ color:#fcd34d; font-weight:600; font-size:.8rem; text-transform:uppercase; }
+        .recommendation-text{ color:#EAF1FB; margin-top:4px; }
+        .modal-footer{ display:flex; gap:12px; padding:20px; border-top:1px solid rgba(255,255,255,0.1); justify-content:flex-end; }
+        .btn-danger{ background:#dc2626; color:#fff; border:1px solid #dc2626; padding:10px 16px; border-radius:6px; cursor:pointer; }
+        .btn-secondary{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:10px 16px; border-radius:6px; cursor:pointer; }
+        .btn-primary{ background:#4F709C; color:#fff; border:1px solid #4F709C; padding:10px 16px; border-radius:6px; cursor:pointer; }
+
+        @media (max-width: 768px){
+            .threat-status-grid{ grid-template-columns:1fr; }
+            .threats-dashboard-grid{ grid-template-columns:1fr; }
+            .threats-table-header{ flex-direction:column; align-items:stretch; }
+            .table-controls{ flex-direction:column; align-items:stretch; }
+            .threat-details-grid{ grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body class="dashboard-modern">
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">Phishing Detection AI</div>
+            <nav class="dash-nav">
+                <a class="dash-link" href="dashboard.html">Overview</a>
+                <a class="dash-link" href="dashboard-analysis.html">Analysis</a>
+                <a class="dash-link" href="dashboard-history.html">History</a>
+                <a class="dash-link active" href="dashboard-threats.html">Threats</a>
+                <a class="dash-link" href="dashboard-reports.html">Reports</a>
+                <a class="dash-link" href="dashboard-integrations.html">Integrations</a>
+                <a class="dash-link" href="dashboard-team.html">Team</a>
+                <a class="dash-link" href="dashboard-plan.html">Plan & Billing</a>
+                <a class="dash-link" href="dashboard-settings.html">Settings</a>
+                <a class="dash-link" href="updates.html">Support</a>
+            </nav>
+        </aside>
+        <div>
+            <div class="dash-hero">
+                <h1 style="margin:0">Threat Intelligence</h1>
+                <div class="subtitle">See detected threats, severity, and recommended actions.</div>
+            </div>
+            <main class="dashboard-main" style="padding: 24px;">
+                <!-- Threat Status Overview -->
+                <div class="threat-status-grid">
+                    <div class="status-card critical">
+                        <div class="status-icon">🚨</div>
+                        <div class="status-content">
+                            <div class="status-number" id="criticalThreats">0</div>
+                            <div class="status-label">Critical Threats</div>
+                        </div>
+                        <div class="status-trend">+2 today</div>
+                    </div>
+                    <div class="status-card high">
+                        <div class="status-icon">⚠️</div>
+                        <div class="status-content">
+                            <div class="status-number" id="highThreats">0</div>
+                            <div class="status-label">High Risk</div>
+                        </div>
+                        <div class="status-trend">+5 today</div>
+                    </div>
+                    <div class="status-card medium">
+                        <div class="status-icon">🔶</div>
+                        <div class="status-content">
+                            <div class="status-number" id="mediumThreats">0</div>
+                            <div class="status-label">Medium Risk</div>
+                        </div>
+                        <div class="status-trend">+12 today</div>
+                    </div>
+                    <div class="status-card blocked">
+                        <div class="status-icon">🛡️</div>
+                        <div class="status-content">
+                            <div class="status-number" id="blockedThreats">0</div>
+                            <div class="status-label">Blocked</div>
+                        </div>
+                        <div class="status-trend">+23 today</div>
+                    </div>
+                </div>
+
+                <!-- Real-time Threat Feed -->
+                <div class="threat-feed-container">
+                    <div class="threat-feed-header">
+                        <h2>Live Threat Feed</h2>
+                        <div class="feed-controls">
+                            <button id="pauseFeed" class="feed-control-btn">⏸️ Pause</button>
+                            <button id="refreshFeed" class="feed-control-btn">🔄 Refresh</button>
+                            <div class="feed-status">
+                                <div class="status-dot live"></div>
+                                <span>Live</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="threatFeed" class="threat-feed"></div>
+                </div>
+
+                <!-- Threat Analysis Dashboard -->
+                <div class="threats-dashboard-grid">
+                    <!-- Attack Patterns Timeline -->
+                    <div class="panel attack-patterns-panel">
+                        <div class="panel-header">
+                            <h3>Attack Patterns (24h)</h3>
+                            <div class="pattern-legend">
+                                <span class="legend-item"><span class="legend-dot phishing"></span>Phishing</span>
+                                <span class="legend-item"><span class="legend-dot malware"></span>Malware</span>
+                                <span class="legend-item"><span class="legend-dot spam"></span>Spam</span>
+                            </div>
+                        </div>
+                        <div class="timeline-container">
+                            <canvas id="attackPatternsChart" width="600" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Threat Intelligence -->
+                    <div class="panel threat-intel-panel">
+                        <div class="panel-header">
+                            <h3>Threat Intelligence</h3>
+                            <button id="updateIntel" class="intel-update-btn">Update</button>
+                        </div>
+                        <div class="intel-content">
+                            <div class="intel-item">
+                                <div class="intel-source">VirusTotal</div>
+                                <div class="intel-status connected">Connected</div>
+                                <div class="intel-last-update">2 min ago</div>
+                            </div>
+                            <div class="intel-item">
+                                <div class="intel-source">PhishTank</div>
+                                <div class="intel-status connected">Connected</div>
+                                <div class="intel-last-update">5 min ago</div>
+                            </div>
+                            <div class="intel-item">
+                                <div class="intel-source">URLVoid</div>
+                                <div class="intel-status disconnected">Offline</div>
+                                <div class="intel-last-update">1 hour ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Threats Table -->
+                <div class="panel threats-table-panel">
+                    <div class="threats-table-header">
+                        <h2>Active Threats</h2>
+                        <div class="table-controls">
+                            <div class="threat-filters">
+                                <select id="severityFilter" class="threat-filter-select">
+                                    <option value="all">All Severities</option>
+                                    <option value="critical">Critical</option>
+                                    <option value="high">High</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                                <select id="typeFilter" class="threat-filter-select">
+                                    <option value="all">All Types</option>
+                                    <option value="phishing">Phishing</option>
+                                    <option value="malware">Malware</option>
+                                    <option value="spam">Spam</option>
+                                    <option value="suspicious">Suspicious</option>
+                                </select>
+                                <select id="statusFilter" class="threat-filter-select">
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="investigating">Investigating</option>
+                                    <option value="resolved">Resolved</option>
+                                    <option value="blocked">Blocked</option>
+                                </select>
+                            </div>
+                            <div class="table-actions">
+                                <button id="bulkBlock" class="action-btn danger">Block Selected</button>
+                                <button id="bulkResolve" class="action-btn secondary">Mark Resolved</button>
+                                <button id="exportThreats" class="action-btn secondary">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="threats-table-container">
+                        <table id="threatsTable" class="threats-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAllThreats"></th>
+                                    <th>Threat</th>
+                                    <th>Severity</th>
+                                    <th>Type</th>
+                                    <th>Source</th>
+                                    <th>First Seen</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="threatsTableBody">
+                                <!-- Threats will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Threat Details Modal -->
+            <div id="threatModal" class="modal-overlay">
+                <div class="modal-content threat-modal">
+                    <div class="modal-header">
+                        <h2 id="threatModalTitle">Threat Details</h2>
+                        <button class="modal-close" onclick="closeThreatModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="threat-details-grid">
+                            <div class="threat-overview">
+                                <div class="threat-severity-badge" id="modalSeverity">HIGH</div>
+                                <h3 id="modalThreatName">Threat Name</h3>
+                                <p id="modalThreatDescription">Threat description will appear here.</p>
+                                
+                                <div class="threat-metadata">
+                                    <div class="metadata-item">
+                                        <strong>Type:</strong> <span id="modalThreatType">Phishing</span>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <strong>First Seen:</strong> <span id="modalFirstSeen">2024-01-15 14:30</span>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <strong>Last Activity:</strong> <span id="modalLastActivity">2024-01-15 16:45</span>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <strong>Affected Users:</strong> <span id="modalAffectedUsers">3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="threat-indicators">
+                                <h4>Indicators of Compromise (IOCs)</h4>
+                                <div id="modalIOCs" class="ioc-list">
+                                    <!-- IOCs will be populated here -->
+                                </div>
+                            </div>
+                            
+                            <div class="threat-timeline">
+                                <h4>Activity Timeline</h4>
+                                <div id="modalTimeline" class="timeline">
+                                    <!-- Timeline will be populated here -->
+                                </div>
+                            </div>
+                            
+                            <div class="threat-recommendations">
+                                <h4>Recommended Actions</h4>
+                                <div id="modalRecommendations" class="recommendations-list">
+                                    <!-- Recommendations will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="blockThreatBtn" class="btn-danger">Block Threat</button>
+                        <button id="investigateBtn" class="btn-secondary">Mark Investigating</button>
+                        <button id="resolveThreatBtn" class="btn-primary">Resolve</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Google API Client -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- Gmail Configuration -->
+    <script src="gmail-config.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="dashboard.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>
+

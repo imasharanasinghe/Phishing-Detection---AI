@@ -1,0 +1,137 @@
+[
+  {
+    "id": "cisa-aa24-001a",
+    "title": "Phishing Campaign Targets Financial Institutions with Fake Invoice Emails",
+    "summary": "CISA warns of an ongoing phishing campaign targeting financial institutions using sophisticated fake invoice emails that bypass traditional security filters. The campaign uses compromised business email accounts to send malicious attachments.",
+    "link": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-001a",
+    "published": "2024-01-15T10:30:00Z",
+    "source": "CISA Cybersecurity Advisories",
+    "tags": ["phishing", "invoice", "financial"]
+  },
+  {
+    "id": "krebs-paypal-phishing",
+    "title": "New Phishing Kit Targets PayPal Users with Convincing Login Pages",
+    "summary": "Security researchers have discovered a new phishing kit that creates convincing PayPal login pages to steal user credentials. The kit includes sophisticated JavaScript to bypass two-factor authentication attempts.",
+    "link": "https://krebsonsecurity.com/2024/01/new-phishing-kit-targets-paypal-users",
+    "published": "2024-01-14T15:45:00Z",
+    "source": "Krebs on Security",
+    "tags": ["phishing", "paypal", "credential"]
+  },
+  {
+    "id": "ncsc-bec-rise",
+    "title": "Business Email Compromise Attacks Rise 40% in Q4 2023",
+    "summary": "The UK's National Cyber Security Centre reports a 40% increase in business email compromise attacks in the final quarter of 2023, with attackers increasingly targeting small and medium businesses.",
+    "link": "https://www.ncsc.gov.uk/news/business-email-compromise-rise",
+    "published": "2024-01-13T09:20:00Z",
+    "source": "NCSC News",
+    "tags": ["business email compromise", "bec", "malware"]
+  },
+  {
+    "id": "cisa-lockbit-ransomware",
+    "title": "Ransomware Group Uses Phishing to Deploy LockBit Variant",
+    "summary": "A new ransomware campaign uses sophisticated phishing emails to deploy a LockBit variant. The emails contain malicious Word documents that execute PowerShell scripts to download and install the ransomware.",
+    "link": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-002b",
+    "published": "2024-01-12T14:15:00Z",
+    "source": "CISA Cybersecurity Advisories",
+    "tags": ["ransomware", "phishing", "malware"]
+  },
+  {
+    "id": "krebs-microsoft365-phishing",
+    "title": "Microsoft 365 Phishing Attacks Surge with New Techniques",
+    "summary": "Attackers are using new techniques to bypass Microsoft 365 security features, including conditional access policies and multi-factor authentication. The attacks focus on credential harvesting through fake login pages.",
+    "link": "https://krebsonsecurity.com/2024/01/microsoft-365-phishing-surge",
+    "published": "2024-01-11T11:30:00Z",
+    "source": "Krebs on Security",
+    "tags": ["phishing", "credential", "spoof"]
+  },
+  {
+    "id": "ncsc-sms-phishing",
+    "title": "SMS Phishing Campaign Targets Banking App Users",
+    "summary": "A new SMS phishing campaign targets users of popular banking apps with fake security alerts. The messages contain links to malicious websites designed to steal banking credentials and personal information.",
+    "link": "https://www.ncsc.gov.uk/news/sms-phishing-banking-apps",
+    "published": "2024-01-10T16:45:00Z",
+    "source": "NCSC News",
+    "tags": ["phishing", "bank", "scam"]
+  },
+  {
+    "id": "cisa-supply-chain",
+    "title": "Supply Chain Attack Uses Phishing to Compromise Software Updates",
+    "summary": "A sophisticated supply chain attack uses phishing emails to compromise software developers and inject malicious code into legitimate software updates. The attack affects multiple software vendors.",
+    "link": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-003c",
+    "published": "2024-01-09T08:20:00Z",
+    "source": "CISA Cybersecurity Advisories",
+    "tags": ["phishing", "malware", "supply chain"]
+  },
+  {
+    "id": "krebs-ai-phishing",
+    "title": "AI-Powered Phishing Emails Bypass Traditional Detection",
+    "summary": "Security researchers warn of AI-powered phishing emails that use natural language processing to create highly convincing messages that bypass traditional email security filters and spam detection systems.",
+    "link": "https://krebsonsecurity.com/2024/01/ai-powered-phishing-emails",
+    "published": "2024-01-08T13:15:00Z",
+    "source": "Krebs on Security",
+    "tags": ["phishing", "ai", "spoof"]
+  },
+  {
+    "id": "ncsc-credential-stuffing",
+    "title": "Credential Stuffing Attacks Target Major Online Platforms",
+    "summary": "A massive credential stuffing campaign targets major online platforms including social media, e-commerce, and financial services. Attackers use previously breached credentials to gain unauthorized access.",
+    "link": "https://www.ncsc.gov.uk/news/credential-stuffing-attacks",
+    "published": "2024-01-07T12:00:00Z",
+    "source": "NCSC News",
+    "tags": ["credential", "malware", "scam"]
+  },
+  {
+    "id": "cisa-zero-day",
+    "title": "Zero-Day Exploit Used in Targeted Phishing Campaign",
+    "summary": "A zero-day exploit is being used in a targeted phishing campaign against government agencies and critical infrastructure. The exploit allows attackers to execute arbitrary code through malicious email attachments.",
+    "link": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-004d",
+    "published": "2024-01-06T09:45:00Z",
+    "source": "CISA Cybersecurity Advisories",
+    "tags": ["phishing", "malware", "zero-day"]
+  },
+  {
+    "id": "krebs-voice-phishing",
+    "title": "Voice Phishing (Vishing) Attacks Increase 300% in Recent Months",
+    "summary": "Voice phishing attacks have increased dramatically, with attackers using AI-generated voices to impersonate legitimate organizations and trick victims into revealing sensitive information over the phone.",
+    "link": "https://krebsonsecurity.com/2024/01/voice-phishing-vishing-rise",
+    "published": "2024-01-05T14:30:00Z",
+    "source": "Krebs on Security",
+    "tags": ["phishing", "ai", "scam"]
+  },
+  {
+    "id": "ncsc-mfa-bypass",
+    "title": "New Techniques Bypass Multi-Factor Authentication Systems",
+    "summary": "Security researchers have identified new attack techniques that can bypass multi-factor authentication systems. The methods exploit vulnerabilities in SMS and authenticator app implementations.",
+    "link": "https://www.ncsc.gov.uk/news/multi-factor-authentication-bypass",
+    "published": "2024-01-04T11:15:00Z",
+    "source": "NCSC News",
+    "tags": ["credential", "malware", "spoof"]
+  },
+  {
+    "id": "cisa-healthcare-phishing",
+    "title": "Phishing Campaign Targets Healthcare Organizations",
+    "summary": "A sophisticated phishing campaign specifically targets healthcare organizations with fake COVID-19 vaccine distribution emails. The campaign aims to steal patient data and disrupt healthcare operations.",
+    "link": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-005e",
+    "published": "2024-01-03T16:20:00Z",
+    "source": "CISA Cybersecurity Advisories",
+    "tags": ["phishing", "malware", "healthcare"]
+  },
+  {
+    "id": "krebs-crypto-phishing",
+    "title": "Cryptocurrency Phishing Schemes Target DeFi Platforms",
+    "summary": "New phishing schemes target decentralized finance (DeFi) platforms and cryptocurrency users. Attackers create fake DeFi websites to steal private keys and cryptocurrency wallets.",
+    "link": "https://krebsonsecurity.com/2024/01/cryptocurrency-phishing-schemes",
+    "published": "2024-01-02T10:45:00Z",
+    "source": "Krebs on Security",
+    "tags": ["phishing", "scam", "cryptocurrency"]
+  },
+  {
+    "id": "ncsc-social-engineering",
+    "title": "Social Engineering Attacks Exploit Remote Work Vulnerabilities",
+    "summary": "Social engineering attacks have increased significantly as attackers exploit remote work vulnerabilities. The attacks use psychological manipulation to trick employees into revealing sensitive information.",
+    "link": "https://www.ncsc.gov.uk/news/social-engineering-attacks",
+    "published": "2024-01-01T13:30:00Z",
+    "source": "NCSC News",
+    "tags": ["phishing", "social engineering", "scam"]
+  }
+]

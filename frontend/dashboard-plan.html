@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan & Billing - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=41">
+    <style>
+        .dash-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .dash-sidebar { background:#1a2a48; border-right:1px solid rgba(255,255,255,0.14); padding:18px; position:sticky; top:0; height:100vh; }
+        .dash-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; letter-spacing:.2px; }
+        .dash-nav { margin-top:18px; display:flex; flex-direction:column; gap:4px; }
+        .dash-link { color:#EAF1FB; padding:10px 12px; border-radius:10px; text-decoration:none; display:flex; align-items:center; gap:10px; border:1px solid transparent; }
+        .dash-link:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); }
+        .dash-link.active { background:rgba(255,255,255,0.10); border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.35) inset; color:#fff; }
+        .dash-hero { background:#213555; border-bottom:1px solid rgba(255,255,255,0.14); padding:24px; color:#fff; }
+        .dash-hero .subtitle { color:#EAF1FB; opacity:.95; margin-top:6px; }
+        @media (max-width: 900px){ .dash-shell{ grid-template-columns: 1fr; } .dash-sidebar{ display:none; } }
+
+        .pricing-page-wrapper { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+        .pricing-dashboard-section {
+            background: rgba(33,53,85,0.92);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 18px;
+            padding: 32px;
+            box-shadow: 0 20px 45px rgba(12,23,44,0.35);
+        }
+        .pricing-dashboard-section .section-title { color: #fff; margin-bottom: 8px; }
+        .pricing-dashboard-section .section-subtitle { color: #cdd9f0; }
+        .pricing-dashboard-section .pricing-toggle {
+            background: rgba(15,27,55,0.45);
+            border: 1px solid rgba(255,255,255,0.14);
+            width: fit-content;
+            margin: 20px auto 0;
+            padding: 10px 16px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f6f9ff;
+        }
+        .pricing-dashboard-section .pricing-grid-modern {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .pricing-dashboard-section .pricing-card-modern {
+            background: rgba(15,27,55,0.55);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #f6f9ff;
+        }
+        .pricing-dashboard-section .pricing-card-modern.featured { box-shadow: 0 20px 40px rgba(61,94,155,0.45); }
+        .pricing-dashboard-section .features-list-modern li { color: #d9e4ff; }
+        .pricing-dashboard-section .btn-pricing { text-align:center; display:block; }
+        .pricing-features {
+            margin-top: 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .pricing-features .feature-comparison {
+            background: rgba(15,27,55,0.45);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 16px;
+            padding: 20px;
+            color: #e5edff;
+        }
+        .pricing-features ul { color: #c9d7f7; }
+        .billing-note { margin-top: 8px; color: #cdd9f0; font-size: 0.9rem; text-align: center; }
+    </style>
+</head>
+<body class="dashboard-modern">
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">Phishing Detection AI</div>
+            <nav class="dash-nav">
+                <a class="dash-link" href="dashboard.html">Overview</a>
+                <a class="dash-link" href="dashboard-analysis.html">Analysis</a>
+                <a class="dash-link" href="dashboard-history.html">History</a>
+                <a class="dash-link" href="dashboard-threats.html">Threats</a>
+                <a class="dash-link" href="dashboard-reports.html">Reports</a>
+                <a class="dash-link" href="dashboard-integrations.html">Integrations</a>
+                <a class="dash-link" href="dashboard-team.html">Team</a>
+                <a class="dash-link active" href="dashboard-plan.html">Plan & Billing</a>
+                <a class="dash-link" href="dashboard-settings.html">Settings</a>
+                <a class="dash-link" href="updates.html">Support</a>
+            </nav>
+        </aside>
+        <div>
+            <div class="dash-hero">
+                <h1>Plans & Billing</h1>
+                <p class="subtitle">Review pricing options and manage your subscription in one place.</p>
+            </div>
+            <main class="dashboard-main">
+                <div class="pricing-page-wrapper">
+                    <section class="pricing-dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Simple Pricing</h2>
+                            <p class="section-subtitle">Choose the plan that fits your security team</p>
+                        </div>
+                        <div class="pricing-toggle">
+                            <span class="toggle-label">Monthly</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dashboardPricingToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="toggle-label">Annual <span class="save-badge">Save 20%</span></span>
+                        </div>
+                        <div class="pricing-grid-modern">
+                            <div class="pricing-card-modern">
+                                <div class="pricing-header">
+                                    <h3>Free</h3>
+                                    <p class="plan-description">Perfect for personal use</p>
+                                    <div class="price-modern">
+                                        <span class="currency">$</span>
+                                        <span class="amount" data-monthly="0" data-annual="0">0</span>
+                                        <span class="period" data-monthly="/month" data-annual="/month">/month</span>
+                                    </div>
+                                </div>
+                                <ul class="features-list-modern">
+                                    <li><span class="check-icon">✓</span> 100 emails/month</li>
+                                    <li><span class="check-icon">✓</span> Baseline threat detection</li>
+                                    <li><span class="check-icon">✓</span> Email reports</li>
+                                    <li><span class="check-icon">×</span> Real-time monitoring</li>
+                                    <li><span class="check-icon">×</span> Advanced analytics</li>
+                                </ul>
+                                <a href="dashboard-settings.html" class="btn-pricing btn-secondary">Stay on Free</a>
+                            </div>
+                            <div class="pricing-card-modern featured">
+                                <div class="popular-badge">Most Popular</div>
+                                <div class="pricing-header">
+                                    <h3>Pro</h3>
+                                    <p class="plan-description">Ideal for small businesses</p>
+                                    <div class="price-modern">
+                                        <span class="currency">$</span>
+                                        <span class="amount" data-monthly="29" data-annual="23">29</span>
+                                        <span class="period" data-monthly="/month" data-annual="/month">/month</span>
+                                    </div>
+                                    <div class="annual-savings" data-monthly="" data-annual="Save $72/year">Save $72/year</div>
+                                </div>
+                                <ul class="features-list-modern">
+                                    <li><span class="check-icon">✓</span> 10,000 emails/month</li>
+                                    <li><span class="check-icon">✓</span> Advanced threat detection</li>
+                                    <li><span class="check-icon">✓</span> Real-time monitoring</li>
+                                    <li><span class="check-icon">✓</span> Detailed analytics</li>
+                                    <li><span class="check-icon">✓</span> Priority support</li>
+                                </ul>
+                                <a href="dashboard-settings.html" class="btn-pricing btn-primary">Upgrade to Pro</a>
+                            </div>
+                            <div class="pricing-card-modern">
+                                <div class="pricing-header">
+                                    <h3>Enterprise</h3>
+                                    <p class="plan-description">For large organizations</p>
+                                    <div class="price-modern">
+                                        <span class="currency">$</span>
+                                        <span class="amount" data-monthly="99" data-annual="79">99</span>
+                                        <span class="period" data-monthly="/month" data-annual="/month">/month</span>
+                                    </div>
+                                    <div class="annual-savings" data-monthly="" data-annual="Save $240/year">Save $240/year</div>
+                                </div>
+                                <ul class="features-list-modern">
+                                    <li><span class="check-icon">✓</span> Unlimited emails</li>
+                                    <li><span class="check-icon">✓</span> Enterprise-grade security</li>
+                                    <li><span class="check-icon">✓</span> Custom integrations</li>
+                                    <li><span class="check-icon">✓</span> Dedicated support</li>
+                                    <li><span class="check-icon">✓</span> Advanced reporting</li>
+                                </ul>
+                                <a href="dashboard-settings.html" class="btn-pricing btn-secondary">Talk to Sales</a>
+                            </div>
+                        </div>
+                        <div class="pricing-features">
+                            <div class="feature-comparison">
+                                <div class="compare-icon">SEC</div>
+                                <p>All plans include enterprise-grade security features and regular updates</p>
+                            </div>
+                            <div class="feature-comparison">
+                                <div class="compare-icon">SUP</div>
+                                <p>Priority support with <strong>Pro</strong> and <strong>Enterprise</strong>, 24/7 critical response for Enterprise</p>
+                            </div>
+                            <div class="feature-comparison">
+                                <div class="compare-icon">API</div>
+                                <p>Advanced integrations and API access unlocked with Enterprise</p>
+                            </div>
+                        </div>
+                        <p class="billing-note">Annual plans billed upfront. Cancel anytime from your account settings.</p>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggle = document.getElementById('dashboardPricingToggle');
+            if (!toggle) return;
+            const amountEls = document.querySelectorAll('.pricing-card-modern .amount');
+            const periodEls = document.querySelectorAll('.pricing-card-modern .period');
+            const savingsEls = document.querySelectorAll('.pricing-card-modern .annual-savings');
+
+            const applyMode = (annual) => {
+                amountEls.forEach(el => {
+                    const value = annual ? el.getAttribute('data-annual') : el.getAttribute('data-monthly');
+                    if (value !== null) el.textContent = value;
+                });
+                periodEls.forEach(el => {
+                    const value = annual ? el.getAttribute('data-annual') : el.getAttribute('data-monthly');
+                    if (value !== null) el.textContent = value;
+                });
+                savingsEls.forEach(el => {
+                    if (!el) return;
+                    const value = annual ? el.getAttribute('data-annual') : el.getAttribute('data-monthly');
+                    if (value) {
+                        el.textContent = value;
+                        el.style.display = annual ? 'block' : 'none';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                });
+            };
+
+            applyMode(toggle.checked);
+            toggle.addEventListener('change', () => applyMode(toggle.checked));
+        });
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script src="gmail-config.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="chatbot.js?v=3"></script>
+</body>
+</html>

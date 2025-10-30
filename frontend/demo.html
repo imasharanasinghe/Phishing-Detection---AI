@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo - Phishing Detection AI</title>
+  <link rel="stylesheet" href="styles.css?v=4"/>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <!-- Demo Page -->
+  <div id="demoPage">
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <h2>🛡️ Phishing Detection AI</h2>
+        </div>
+        <div class="nav-menu">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="index.html#features" class="nav-link">Features</a>
+          <a href="index.html#pricing" class="nav-link">Pricing</a>
+          <div class="nav-auth">
+            <a href="sign-in.html" class="btn-secondary">Sign In</a>
+            <a href="sign-up.html" class="btn-primary">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+      <div class="container">
+        <div class="demo-header">
+          <h1 class="demo-title">See Phishing Detection AI in Action</h1>
+          <p class="demo-description">
+            Watch how our AI-powered system analyzes emails and detects phishing attempts in real-time.
+          </p>
+        </div>
+
+        <div class="video-container">
+          <div class="video-wrapper">
+            <video 
+              id="demoVideo" 
+              class="demo-video" 
+              controls 
+              preload="metadata"
+              poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%231a1a1a'/%3E%3Ctext x='400' y='225' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-size='24'%3E🛡️ Phishing Detection AI Demo%3C/text%3E%3C/svg%3E"
+            >
+              <source src="video/video1.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            
+            <!-- Video Controls Overlay -->
+            <div class="video-overlay">
+              <div class="play-button" id="playButton">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                  <circle cx="40" cy="40" r="40" fill="rgba(0,0,0,0.7)"/>
+                  <path d="M30 25L55 40L30 55V25Z" fill="white"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Video Info -->
+          <div class="video-info">
+            <h3>What You'll See in This Demo:</h3>
+            <ul class="demo-features">
+              <li>✓ Real-time email analysis</li>
+              <li>✓ AI-powered threat detection</li>
+              <li>✓ Detailed risk scoring</li>
+              <li>✓ Interactive dashboard</li>
+              <li>✓ Chrome extension integration</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="demo-cta">
+          <h2>Ready to Get Started?</h2>
+          <p>Experience the power of AI-driven phishing protection for yourself.</p>
+          <div class="cta-buttons">
+            <a href="sign-up.html" class="btn-primary btn-large">Start Free Trial</a>
+            <a href="index.html" class="btn-secondary btn-large">Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>🛡️ Phishing Detection AI</h3>
+            <p>Protecting your digital life with advanced AI technology.</p>
+          </div>
+          <div class="footer-section">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="index.html#features">Features</a></li>
+              <li><a href="index.html#pricing">Pricing</a></li>
+              <li><a href="#">API</a></li>
+              <li><a href="#">Chrome Extension</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Status</a></li>
+              <li><a href="#">Documentation</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="#">About</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Privacy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Phishing Detection AI. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    // Demo page specific JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+      const video = document.getElementById('demoVideo');
+      const playButton = document.getElementById('playButton');
+      const overlay = document.querySelector('.video-overlay');
+
+      // Play button functionality
+      playButton.addEventListener('click', function() {
+        video.play();
+        overlay.style.display = 'none';
+      });
+
+      // Show overlay when video is paused
+      video.addEventListener('pause', function() {
+        overlay.style.display = 'flex';
+      });
+
+      // Hide overlay when video starts playing
+      video.addEventListener('play', function() {
+        overlay.style.display = 'none';
+      });
+
+      // Show overlay when video ends
+      video.addEventListener('ended', function() {
+        overlay.style.display = 'flex';
+      });
+
+      // Keyboard controls
+      document.addEventListener('keydown', function(e) {
+        if (e.code === 'Space' && e.target === video) {
+          e.preventDefault();
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+        }
+      });
+    });
+  </script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

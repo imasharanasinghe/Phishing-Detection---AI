@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body { 
+        font-family: system-ui, -apple-system, sans-serif; 
+        min-width: 320px; 
+        padding: 12px; 
+        background: #0b1a33;
+        color: #fff;
+        margin: 0;
+      }
+      
+      h3 {
+        margin: 0 0 12px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #ff7c01;
+      }
+      
+      label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #ccc;
+      }
+      
+      input, textarea {
+        width: 100%;
+        border: 1px solid #163a74;
+        border-radius: 6px;
+        padding: 8px;
+        background: #091a36;
+        color: #fff;
+        font-family: inherit;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      
+      input:focus, textarea:focus {
+        outline: none;
+        border-color: #ff7c01;
+      }
+      
+      textarea {
+        height: 120px;
+        resize: vertical;
+      }
+      
+      button {
+        width: 100%;
+        background: #ff7c01;
+        color: #0b1a33;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+      }
+      
+      button:hover {
+        filter: brightness(1.05);
+        transform: translateY(-1px);
+      }
+      
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+      
+      #out {
+        margin-top: 12px;
+        padding: 8px;
+        background: #091a36;
+        border-radius: 6px;
+        border: 1px solid #163a74;
+        font-size: 12px;
+        min-height: 40px;
+        word-wrap: break-word;
+      }
+      
+      .help-text {
+        font-size: 10px;
+        color: #888;
+        margin-top: 4px;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>🛡️ Phishing Detection AI</h3>
+    
+    <label>Backend URL</label>
+    <input id="api" placeholder="http://localhost:3000" />
+    
+    <label>Email Content</label>
+    <textarea id="raw" placeholder="Paste email content here..."></textarea>
+    <div class="help-text">Tip: Use Ctrl+Enter to analyze</div>
+    
+    <button id="send">Analyze Email</button>
+    
+    <div id="out">Ready to analyze...</div>
+    
+    <script src="popup.js"></script>
+  </body>
+</html>

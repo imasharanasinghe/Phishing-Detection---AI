@@ -1,0 +1,74 @@
+[
+  {
+    "id": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-001a",
+    "title": "Phishing Campaign Targets Financial Institutions with Fake Invoice Emails",
+    "summary": "CISA warns of an ongoing phishing campaign targeting financial institutions using sophisticated fake invoice emails that bypass traditional security filters. The campaign uses compromised business email accounts to send malicious attachments.",
+    "link": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-001a",
+    "published": "2024-01-15T10:30:00Z",
+    "source": "CISA Cybersecurity Advisories",
+    "tags": ["phishing", "invoice", "financial"]
+  },
+  {
+    "id": "https://krebsonsecurity.com/2024/01/new-phishing-kit-targets-paypal-users",
+    "title": "New Phishing Kit Targets PayPal Users with Convincing Login Pages",
+    "summary": "Security researchers have discovered a new phishing kit that creates convincing PayPal login pages to steal user credentials. The kit includes sophisticated JavaScript to bypass two-factor authentication attempts.",
+    "link": "https://krebsonsecurity.com/2024/01/new-phishing-kit-targets-paypal-users",
+    "published": "2024-01-14T15:45:00Z",
+    "source": "Krebs on Security",
+    "tags": ["phishing", "paypal", "credential"]
+  },
+  {
+    "id": "https://www.ncsc.gov.uk/news/business-email-compromise-rise",
+    "title": "Business Email Compromise Attacks Rise 40% in Q4 2023",
+    "summary": "The UK's National Cyber Security Centre reports a 40% increase in business email compromise attacks in the final quarter of 2023, with attackers increasingly targeting small and medium businesses.",
+    "link": "https://www.ncsc.gov.uk/news/business-email-compromise-rise",
+    "published": "2024-01-13T09:20:00Z",
+    "source": "NCSC News",
+    "tags": ["business email compromise", "bec", "malware"]
+  },
+  {
+    "id": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-002b",
+    "title": "Ransomware Group Uses Phishing to Deploy LockBit Variant",
+    "summary": "A new ransomware campaign uses sophisticated phishing emails to deploy a LockBit variant. The emails contain malicious Word documents that execute PowerShell scripts to download and install the ransomware.",
+    "link": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-002b",
+    "published": "2024-01-12T14:15:00Z",
+    "source": "CISA Cybersecurity Advisories",
+    "tags": ["ransomware", "phishing", "malware"]
+  },
+  {
+    "id": "https://krebsonsecurity.com/2024/01/microsoft-365-phishing-surge",
+    "title": "Microsoft 365 Phishing Attacks Surge with New Techniques",
+    "summary": "Attackers are using new techniques to bypass Microsoft 365 security features, including conditional access policies and multi-factor authentication. The attacks focus on credential harvesting through fake login pages.",
+    "link": "https://krebsonsecurity.com/2024/01/microsoft-365-phishing-surge",
+    "published": "2024-01-11T11:30:00Z",
+    "source": "Krebs on Security",
+    "tags": ["phishing", "credential", "spoof"]
+  },
+  {
+    "id": "https://www.ncsc.gov.uk/news/sms-phishing-banking-apps",
+    "title": "SMS Phishing Campaign Targets Banking App Users",
+    "summary": "A new SMS phishing campaign targets users of popular banking apps with fake security alerts. The messages contain links to malicious websites designed to steal banking credentials and personal information.",
+    "link": "https://www.ncsc.gov.uk/news/sms-phishing-banking-apps",
+    "published": "2024-01-10T16:45:00Z",
+    "source": "NCSC News",
+    "tags": ["phishing", "bank", "scam"]
+  },
+  {
+    "id": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-003c",
+    "title": "Supply Chain Attack Uses Phishing to Compromise Software Updates",
+    "summary": "A sophisticated supply chain attack uses phishing emails to compromise software developers and inject malicious code into legitimate software updates. The attack affects multiple software vendors.",
+    "link": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-003c",
+    "published": "2024-01-09T08:20:00Z",
+    "source": "CISA Cybersecurity Advisories",
+    "tags": ["phishing", "malware", "supply chain"]
+  },
+  {
+    "id": "https://krebsonsecurity.com/2024/01/ai-powered-phishing-emails",
+    "title": "AI-Powered Phishing Emails Bypass Traditional Detection",
+    "summary": "Security researchers warn of AI-powered phishing emails that use natural language processing to create highly convincing messages that bypass traditional email security filters and spam detection systems.",
+    "link": "https://krebsonsecurity.com/2024/01/ai-powered-phishing-emails",
+    "published": "2024-01-08T13:15:00Z",
+    "source": "Krebs on Security",
+    "tags": ["phishing", "ai", "spoof"]
+  }
+]

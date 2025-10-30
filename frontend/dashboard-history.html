@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=41">
+    <style>
+        .dash-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .dash-sidebar { background:#1a2a48; border-right:1px solid rgba(255,255,255,0.14); padding:18px; position:sticky; top:0; height:100vh; }
+        .dash-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; letter-spacing:.2px; }
+        .dash-nav { margin-top:18px; display:flex; flex-direction:column; gap:4px; }
+        .dash-link { color:#EAF1FB; padding:10px 12px; border-radius:10px; text-decoration:none; display:flex; align-items:center; gap:10px; border:1px solid transparent; }
+        .dash-link:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); }
+        .dash-link.active { background:rgba(255,255,255,0.10); border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.35) inset; color:#fff; }
+        .dash-hero { background:#213555; border-bottom:1px solid rgba(255,255,255,0.14); padding:24px 24px; color:#fff; }
+        .dash-hero .subtitle { color:#EAF1FB; opacity:.95; margin-top:6px; }
+        @media (max-width: 900px){ .dash-shell{ grid-template-columns: 1fr; } .dash-sidebar{ display:none; } }
+
+        /* History page scoped styles */
+        .saved-views-strip{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+        .view-chips{ display:flex; gap:8px; flex-wrap:wrap; }
+        .view-chip{ background:rgba(255,255,255,0.06); color:#EAF1FB; border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:8px 16px; cursor:pointer; transition:all .2s; }
+        .view-chip:hover{ background:rgba(255,255,255,0.1); }
+        .view-chip.active{ background:#4F709C; border-color:#4F709C; color:#fff; }
+        .save-view-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:8px 14px; cursor:pointer; }
+
+        .trend-strip{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:14px; padding:16px; margin-bottom:18px; }
+        .trend-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+        .trend-header h3{ color:#fff; margin:0; }
+        .trend-legend{ display:flex; gap:16px; }
+        .legend-item{ display:flex; align-items:center; gap:6px; color:#EAF1FB; font-size:.9rem; }
+        .legend-dot{ width:10px; height:10px; border-radius:50%; }
+        .legend-dot.high{ background:#dc2626; }
+        .legend-dot.medium{ background:#d97706; }
+        .legend-dot.low{ background:#059669; }
+        .trend-chart-container{ position:relative; height:120px; }
+
+        .faceted-filters{ background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:16px; }
+        .filter-row{ display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; align-items:end; }
+        .filter-row + .filter-row{ margin-top:12px; }
+        .filter-group{ display:flex; flex-direction:column; gap:4px; }
+        .filter-group label{ color:#EAF1FB; font-size:.9rem; font-weight:500; }
+        .filter-select, .filter-input{ background:rgba(255,255,255,0.06); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:8px 10px; outline:none; }
+        .filter-select:focus, .filter-input:focus{ box-shadow:0 0 0 2px rgba(79,112,156,0.25); }
+        .filter-actions{ display:flex; gap:8px; }
+        .filter-btn{ padding:8px 12px; border-radius:8px; cursor:pointer; border:1px solid; }
+        .filter-btn.clear{ background:transparent; color:#EAF1FB; border-color:rgba(255,255,255,0.18); }
+        .filter-btn.apply{ background:#4F709C; color:#fff; border-color:#4F709C; }
+
+        .bulk-actions-bar{ background:rgba(79,112,156,0.15); border:1px solid rgba(79,112,156,0.3); border-radius:10px; padding:12px 16px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; }
+        .bulk-selection{ display:flex; align-items:center; gap:10px; color:#EAF1FB; }
+        .bulk-checkbox{ width:16px; height:16px; }
+        .bulk-buttons{ display:flex; gap:8px; }
+        .bulk-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:6px 12px; cursor:pointer; }
+        .bulk-btn.danger{ background:rgba(220,38,38,0.2); border-color:rgba(220,38,38,0.4); color:#fca5a5; }
+
+        .history-list .history-item{ background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:14px; margin-bottom:10px; position:relative; }
+        .history-item.selected{ border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.25); }
+        .history-item-checkbox{ position:absolute; top:12px; left:12px; width:16px; height:16px; }
+        .history-item-main{ margin-left:32px; }
+        .history-item-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+        .history-subject{ color:#fff; font-weight:600; }
+        .history-risk-badge{ padding:4px 8px; border-radius:999px; font-size:.8rem; font-weight:600; }
+        .history-risk-badge.high{ background:rgba(220,38,38,0.2); color:#fca5a5; }
+        .history-risk-badge.medium{ background:rgba(217,119,6,0.2); color:#fcd34d; }
+        .history-risk-badge.low{ background:rgba(5,150,105,0.2); color:#6ee7b7; }
+        .history-item-details{ display:flex; align-items:center; gap:16px; color:#9fb4d3; font-size:.9rem; }
+        .history-actions-item{ display:flex; gap:6px; }
+        .history-action-btn{ background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:6px 8px; cursor:pointer; color:#EAF1FB; }
+        .history-item-preview{ margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1); display:none; }
+        .history-item-preview.expanded{ display:block; }
+        .preview-content{ background:rgba(255,255,255,0.02); border-radius:8px; padding:12px; }
+
+        @media (max-width: 768px){
+            .filter-row{ grid-template-columns: 1fr; }
+            .saved-views-strip{ flex-direction:column; align-items:stretch; gap:12px; }
+            .bulk-actions-bar{ flex-direction:column; align-items:stretch; gap:8px; }
+        }
+    </style>
+</head>
+<body class="dashboard-modern">
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">Phishing Detection AI</div>
+            <nav class="dash-nav">
+                <a class="dash-link" href="dashboard.html">Overview</a>
+                <a class="dash-link" href="dashboard-analysis.html">Analysis</a>
+                <a class="dash-link active" href="dashboard-history.html">History</a>
+                <a class="dash-link" href="dashboard-threats.html">Threats</a>
+                <a class="dash-link" href="dashboard-reports.html">Reports</a>
+                <a class="dash-link" href="dashboard-integrations.html">Integrations</a>
+                <a class="dash-link" href="dashboard-team.html">Team</a>
+                <a class="dash-link" href="dashboard-plan.html">Plan & Billing</a>
+                <a class="dash-link" href="dashboard-settings.html">Settings</a>
+                <a class="dash-link" href="updates.html">Support</a>
+            </nav>
+        </aside>
+        <div>
+            <div class="dash-hero">
+                <h1 style="margin:0">Analysis History</h1>
+                <div class="subtitle">Review past scans and filter by risk level or date.</div>
+            </div>
+            <main class="dashboard-main" style="padding: 24px;">
+                <!-- Saved Views & Quick Filters -->
+                <div class="saved-views-strip">
+                    <div class="view-chips">
+                        <button class="view-chip active" data-view="all">All Items</button>
+                        <button class="view-chip" data-view="high-risk">High Risk</button>
+                        <button class="view-chip" data-view="unknown-tlds">Unknown TLDs</button>
+                        <button class="view-chip" data-view="past-7-days">Past 7 Days</button>
+                        <button class="view-chip" data-view="has-links">Has Links</button>
+                    </div>
+                    <button id="saveCurrentView" class="save-view-btn">Save Current View</button>
+                </div>
+
+                <!-- Trend Strip -->
+                <div class="trend-strip panel">
+                    <div class="trend-header">
+                        <h3>Analysis Trend</h3>
+                        <div class="trend-legend">
+                            <span class="legend-item"><span class="legend-dot high"></span>High Risk</span>
+                            <span class="legend-item"><span class="legend-dot medium"></span>Medium Risk</span>
+                            <span class="legend-item"><span class="legend-dot low"></span>Low Risk</span>
+                        </div>
+                    </div>
+                    <div class="trend-chart-container">
+                        <canvas id="trendChart" width="800" height="120"></canvas>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div class="panel history-panel" style="background:#213555;border:1px solid rgba(255,255,255,0.22);">
+                    <div class="history-header">
+                        <h2>Analysis History</h2>
+                        <div class="history-controls">
+                            <div class="faceted-filters">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label>Risk Level</label>
+                                        <select id="riskFilter" class="filter-select">
+                                            <option value="all">All Risk Levels</option>
+                                            <option value="high">High Risk</option>
+                                            <option value="medium">Medium Risk</option>
+                                            <option value="low">Low Risk</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Source</label>
+                                        <select id="sourceFilter" class="filter-select">
+                                            <option value="all">All Sources</option>
+                                            <option value="manual">Manual Entry</option>
+                                            <option value="gmail">Gmail</option>
+                                            <option value="outlook">Outlook</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Date Range</label>
+                                        <select id="dateFilter" class="filter-select">
+                                            <option value="all">All Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                            <option value="month">This Month</option>
+                                            <option value="custom">Custom Range</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Attachments</label>
+                                        <select id="attachmentFilter" class="filter-select">
+                                            <option value="all">Any</option>
+                                            <option value="has-attachments">Has Attachments</option>
+                                            <option value="no-attachments">No Attachments</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label>Sender Domain</label>
+                                        <input type="text" id="domainFilter" class="filter-input" placeholder="e.g., gmail.com">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Has Links</label>
+                                        <select id="linkFilter" class="filter-select">
+                                            <option value="all">Any</option>
+                                            <option value="has-links">Has Links</option>
+                                            <option value="no-links">No Links</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Search</label>
+                                        <input type="text" id="searchFilter" class="filter-input" placeholder="Search subject or content...">
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button id="clearFilters" class="filter-btn clear">Clear</button>
+                                        <button id="applyFilters" class="filter-btn apply">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Actions Bar -->
+                    <div id="bulkActionsBar" class="bulk-actions-bar" style="display:none;">
+                        <div class="bulk-selection">
+                            <input type="checkbox" id="selectAll" class="bulk-checkbox">
+                            <span id="selectedCount">0 selected</span>
+                        </div>
+                        <div class="bulk-buttons">
+                            <button id="bulkExport" class="bulk-btn">Export Selected</button>
+                            <button id="bulkMarkSafe" class="bulk-btn">Mark as Safe</button>
+                            <button id="bulkDelete" class="bulk-btn danger">Delete Selected</button>
+                        </div>
+                    </div>
+
+                    <div class="history-stats">
+                        <div class="stat-item"><span class="stat-number" id="totalAnalyses">0</span><span class="stat-label">Total</span></div>
+                        <div class="stat-item"><span class="stat-number" id="highRiskCount">0</span><span class="stat-label">High Risk</span></div>
+                        <div class="stat-item"><span class="stat-number" id="mediumRiskCount">0</span><span class="stat-label">Medium Risk</span></div>
+                        <div class="stat-item"><span class="stat-number" id="lowRiskCount">0</span><span class="stat-label">Low Risk</span></div>
+                        <div class="stat-item"><span class="stat-number" id="filteredCount">0</span><span class="stat-label">Filtered</span></div>
+                    </div>
+
+                    <div class="history-content">
+                        <div id="historyList" class="history-list"></div>
+                        <div id="noHistoryMessage" class="no-history" style="display:none;">
+                            <h3>No Analysis History</h3>
+                            <p>Start analyzing emails to see your history here</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Google API Client -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- Gmail Configuration -->
+    <script src="gmail-config.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="dashboard.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>
+

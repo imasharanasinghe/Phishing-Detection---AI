@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=41">
+    <style>
+        .dash-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .dash-sidebar { background:#1a2a48; border-right:1px solid rgba(255,255,255,0.14); padding:18px; position:sticky; top:0; height:100vh; }
+        .dash-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; letter-spacing:.2px; }
+        .dash-nav { margin-top:18px; display:flex; flex-direction:column; gap:4px; }
+        .dash-link { color:#EAF1FB; padding:10px 12px; border-radius:10px; text-decoration:none; display:flex; align-items:center; gap:10px; border:1px solid transparent; }
+        .dash-link:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); }
+        .dash-link.active { background:rgba(255,255,255,0.10); border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.35) inset; color:#fff; }
+        .dash-hero { background:#213555; border-bottom:1px solid rgba(255,255,255,0.14); padding:24px 24px; color:#fff; }
+        .dash-hero .subtitle { color:#EAF1FB; opacity:.95; margin-top:6px; }
+        @media (max-width: 900px){ .dash-shell{ grid-template-columns: 1fr; } .dash-sidebar{ display:none; } }
+
+        /* Settings page scoped styles */
+        .settings-nav-section{ margin-bottom:24px; }
+        .settings-nav{ display:flex; gap:8px; flex-wrap:wrap; }
+        .settings-nav-btn{ background:rgba(255,255,255,0.06); color:#EAF1FB; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:10px 16px; cursor:pointer; transition:all 0.2s; font-weight:600; }
+        .settings-nav-btn:hover{ background:rgba(255,255,255,0.1); }
+        .settings-nav-btn.active{ background:#4F709C; border-color:#4F709C; color:#fff; }
+
+        .settings-section{ display:none; }
+        .settings-section.active{ display:block; }
+        .section-header{ margin-bottom:24px; }
+        .section-header h2{ color:#fff; margin:0 0 8px 0; font-size:1.8rem; }
+        .section-header p{ color:#9fb4d3; margin:0; }
+
+        .settings-cards{ display:flex; flex-direction:column; gap:24px; }
+        .settings-card{ background:rgba(33,53,85,0.95); border:1px solid rgba(255,255,255,0.14); border-radius:12px; overflow:hidden; }
+        .card-header{ padding:20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .card-header h3{ color:#fff; margin:0 0 6px 0; font-size:1.3rem; }
+        .card-header p{ color:#9fb4d3; margin:0; font-size:.9rem; }
+        .card-content{ padding:20px; }
+
+        /* Profile Section */
+        .profile-section{ display:grid; grid-template-columns:auto 1fr; gap:24px; align-items:start; }
+        .profile-avatar{ display:flex; flex-direction:column; align-items:center; gap:12px; }
+        .profile-avatar img{ width:80px; height:80px; border-radius:50%; border:3px solid #4F709C; }
+        .avatar-upload-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:6px 12px; border-radius:6px; cursor:pointer; font-size:.9rem; }
+        .avatar-upload-btn:hover{ background:rgba(255,255,255,0.12); }
+        .profile-form{ flex:1; }
+        .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .form-group{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+        .form-group label{ color:#EAF1FB; font-weight:600; font-size:.9rem; }
+        .form-input, .form-select{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:10px 12px; transition:all 0.2s; }
+        .form-input:focus, .form-select:focus{ border-color:#4F709C; background:rgba(255,255,255,0.12); outline:none; }
+        .form-actions{ display:flex; gap:12px; margin-top:20px; }
+        .btn-primary{ background:#4F709C; color:#fff; border:1px solid #4F709C; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600; }
+        .btn-secondary{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600; }
+        .btn-danger{ background:#dc2626; color:#fff; border:1px solid #dc2626; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600; }
+        .btn-primary:hover{ background:#3a5a80; border-color:#3a5a80; }
+        .btn-secondary:hover{ background:rgba(255,255,255,0.12); }
+        .btn-danger:hover{ background:#b91c1c; border-color:#b91c1c; }
+
+        /* Status Items */
+        .status-items{ display:flex; flex-direction:column; gap:16px; }
+        .status-item{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .status-info{ flex:1; }
+        .status-label{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .status-description{ color:#9fb4d3; font-size:.9rem; }
+        .status-badge{ padding:4px 10px; border-radius:6px; font-size:.8rem; font-weight:700; text-transform:uppercase; }
+        .status-badge.verified{ background:rgba(16,185,129,0.2); color:#6ee7b7; }
+        .status-badge.enabled{ background:rgba(79,112,156,0.2); color:#9db4d4; }
+        .status-badge.pro{ background:rgba(245,158,11,0.2); color:#fbbf24; }
+        .status-value{ color:#EAF1FB; font-weight:600; }
+
+        /* Security Section */
+        .security-section{ display:flex; flex-direction:column; gap:16px; }
+        .password-strength{ margin-top:8px; }
+        .strength-bar{ height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin-bottom:4px; }
+        .strength-fill{ height:100%; transition:all 0.3s; border-radius:2px; }
+        .strength-text{ font-size:.8rem; color:#9fb4d3; }
+
+        /* Two-Factor Authentication */
+        .tfa-section{ display:flex; flex-direction:column; gap:20px; }
+        .tfa-status{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .tfa-info{ display:flex; align-items:center; gap:12px; }
+        .tfa-icon{ font-size:1.5rem; }
+        .tfa-details{ flex:1; }
+        .tfa-title{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .tfa-description{ color:#9fb4d3; font-size:.9rem; }
+        .tfa-methods{ display:flex; flex-direction:column; gap:12px; }
+        .method-item{ display:flex; align-items:center; justify-content:space-between; padding:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .method-info{ display:flex; align-items:center; gap:12px; }
+        .method-icon{ font-size:1.2rem; }
+        .method-details{ flex:1; }
+        .method-name{ color:#fff; font-weight:600; margin-bottom:2px; }
+        .method-description{ color:#9fb4d3; font-size:.8rem; }
+        .method-status{ padding:4px 8px; border-radius:4px; font-size:.8rem; font-weight:600; }
+        .method-status.active{ background:rgba(16,185,129,0.2); color:#6ee7b7; }
+        .method-action{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:6px 12px; border-radius:4px; cursor:pointer; font-size:.8rem; }
+        .method-action:hover{ background:rgba(255,255,255,0.12); }
+        .backup-codes{ display:flex; gap:12px; }
+
+        /* Sessions */
+        .sessions-list{ display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+        .session-item{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .session-item.current{ border-color:#4F709C; }
+        .session-info{ display:flex; align-items:center; gap:16px; flex:1; }
+        .session-device{ display:flex; align-items:center; gap:12px; }
+        .device-icon{ font-size:1.2rem; }
+        .device-details{ flex:1; }
+        .device-name{ color:#fff; font-weight:600; margin-bottom:2px; }
+        .device-location{ color:#9fb4d3; font-size:.8rem; }
+        .session-time{ color:#9fb4d3; font-size:.8rem; }
+        .session-badge{ padding:4px 8px; border-radius:4px; font-size:.8rem; font-weight:600; }
+        .session-badge.current{ background:rgba(79,112,156,0.2); color:#9db4d4; }
+        .session-action{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:6px 12px; border-radius:4px; cursor:pointer; font-size:.8rem; }
+        .session-action:hover{ background:rgba(255,255,255,0.12); }
+        .sessions-actions{ display:flex; gap:12px; }
+
+        /* Notifications */
+        .notification-items{ display:flex; flex-direction:column; gap:16px; }
+        .notification-item{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .notification-info{ flex:1; }
+        .notification-title{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .notification-description{ color:#9fb4d3; font-size:.9rem; }
+        .toggle-switch{ position:relative; display:inline-block; width:44px; height:24px; }
+        .toggle-switch input{ opacity:0; width:0; height:0; }
+        .toggle-slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.2); transition:.4s; border-radius:24px; }
+        .toggle-slider:before{ position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:#fff; transition:.4s; border-radius:50%; }
+        input:checked + .toggle-slider{ background:#4F709C; }
+        input:checked + .toggle-slider:before{ transform:translateX(20px); }
+
+        /* Push Notifications */
+        .push-section{ display:flex; flex-direction:column; gap:20px; }
+        .push-status{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .push-info{ display:flex; align-items:center; gap:12px; }
+        .push-icon{ font-size:1.5rem; }
+        .push-details{ flex:1; }
+        .push-title{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .push-description{ color:#9fb4d3; font-size:.9rem; }
+
+        /* Alert Preferences */
+        .alert-preferences{ display:flex; flex-direction:column; gap:16px; }
+        .time-range{ display:flex; align-items:center; gap:8px; }
+        .time-range span{ color:#9fb4d3; }
+        .form-description{ color:#9fb4d3; font-size:.8rem; margin-top:4px; }
+
+        /* Preferences */
+        .preference-items, .dashboard-preferences{ display:flex; flex-direction:column; gap:16px; }
+        .preference-item{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .preference-info{ flex:1; }
+        .preference-title{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .preference-description{ color:#9fb4d3; font-size:.9rem; }
+        .preference-select, .privacy-select{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:8px 12px; min-width:150px; }
+
+        /* Privacy & Data */
+        .data-actions{ display:flex; flex-direction:column; gap:16px; }
+        .data-item{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .data-info{ display:flex; align-items:center; gap:12px; }
+        .data-icon{ font-size:1.5rem; }
+        .data-details{ flex:1; }
+        .data-title{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .data-description{ color:#9fb4d3; font-size:.9rem; }
+        .privacy-items{ display:flex; flex-direction:column; gap:16px; }
+        .privacy-item{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .privacy-info{ flex:1; }
+        .privacy-title{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .privacy-description{ color:#9fb4d3; font-size:.9rem; }
+
+        /* Advanced Settings */
+        .api-section{ display:flex; flex-direction:column; gap:20px; }
+        .api-keys{ display:flex; flex-direction:column; gap:12px; }
+        .api-key-item{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .api-key-info{ flex:1; }
+        .api-key-name{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .api-key-value{ color:#9fb4d3; font-family:monospace; font-size:.9rem; margin-bottom:4px; }
+        .api-key-created{ color:#9fb4d3; font-size:.8rem; }
+        .api-key-actions{ display:flex; gap:8px; }
+        .api-action-btn{ background:rgba(255,255,255,0.08); color:#EAF1FB; border:1px solid rgba(255,255,255,0.18); padding:6px 10px; border-radius:4px; cursor:pointer; font-size:.8rem; }
+        .api-action-btn:hover{ background:rgba(255,255,255,0.12); }
+        .api-action-btn.danger{ background:rgba(239,68,68,0.2); color:#fca5a5; border-color:rgba(239,68,68,0.4); }
+        .api-actions{ display:flex; gap:12px; }
+        .system-preferences{ display:flex; flex-direction:column; gap:16px; }
+        .system-item{ display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; }
+        .system-info{ flex:1; }
+        .system-title{ color:#fff; font-weight:600; margin-bottom:4px; }
+        .system-description{ color:#9fb4d3; font-size:.9rem; }
+
+        /* Delete Account Modal */
+        .modal-overlay{ position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:1000; }
+        .delete-account-modal{ background:#213555; border:1px solid rgba(255,255,255,0.2); border-radius:12px; max-width:500px; width:90vw; max-height:90vh; overflow:hidden; }
+        .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .modal-header h2{ color:#fff; margin:0; }
+        .modal-close{ background:none; border:none; color:#EAF1FB; font-size:1.5rem; cursor:pointer; }
+        .modal-body{ padding:20px; max-height:60vh; overflow-y:auto; }
+        .delete-warning{ display:flex; gap:16px; }
+        .warning-icon{ font-size:2rem; }
+        .warning-content{ flex:1; }
+        .warning-content h3{ color:#ef4444; margin:0 0 12px 0; }
+        .warning-content p{ color:#EAF1FB; margin-bottom:12px; }
+        .warning-content ul{ color:#9fb4d3; padding-left:20px; margin-bottom:16px; }
+        .warning-content li{ margin-bottom:4px; }
+        .modal-footer{ display:flex; gap:12px; padding:20px; border-top:1px solid rgba(255,255,255,0.1); justify-content:flex-end; }
+
+        @media (max-width: 768px){
+            .settings-nav{ flex-direction:column; }
+            .profile-section{ grid-template-columns:1fr; text-align:center; }
+            .form-row{ grid-template-columns:1fr; }
+            .form-actions{ flex-direction:column; }
+            .status-item, .notification-item, .preference-item, .data-item, .privacy-item, .system-item{ flex-direction:column; align-items:stretch; gap:12px; }
+            .tfa-status, .push-status, .session-item, .api-key-item{ flex-direction:column; align-items:stretch; gap:12px; }
+            .sessions-actions, .api-actions, .backup-codes{ flex-direction:column; }
+        }
+    </style>
+</head>
+<body class="dashboard-modern">
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">Phishing Detection AI</div>
+            <nav class="dash-nav">
+                <a class="dash-link" href="dashboard.html">Overview</a>
+                <a class="dash-link" href="dashboard-analysis.html">Analysis</a>
+                <a class="dash-link" href="dashboard-history.html">History</a>
+                <a class="dash-link" href="dashboard-threats.html">Threats</a>
+                <a class="dash-link" href="dashboard-reports.html">Reports</a>
+                <a class="dash-link" href="dashboard-integrations.html">Integrations</a>
+                <a class="dash-link" href="dashboard-team.html">Team</a>
+                <a class="dash-link" href="dashboard-plan.html">Plan & Billing</a>
+                <a class="dash-link active" href="dashboard-settings.html">Settings</a>
+                <a class="dash-link" href="updates.html">Support</a>
+            </nav>
+        </aside>
+        <div>
+            <div class="dash-hero">
+                <h1 style="margin:0">Settings</h1>
+                <div class="subtitle">Configure preferences, security, and notifications.</div>
+            </div>
+            <main class="dashboard-main" style="padding: 24px;">
+                <!-- Settings Navigation -->
+                <div class="settings-nav-section">
+                    <div class="settings-nav">
+                        <button class="settings-nav-btn active" data-section="account">Account</button>
+                        <button class="settings-nav-btn" data-section="security">Security</button>
+                        <button class="settings-nav-btn" data-section="notifications">Notifications</button>
+                        <button class="settings-nav-btn" data-section="preferences">Preferences</button>
+                        <button class="settings-nav-btn" data-section="privacy">Privacy & Data</button>
+                        <button class="settings-nav-btn" data-section="advanced">Advanced</button>
+                    </div>
+                </div>
+
+                <!-- Account Settings -->
+                <div id="account-section" class="settings-section active">
+                    <div class="section-header">
+                        <h2>Account Settings</h2>
+                        <p>Manage your profile information and account details</p>
+                    </div>
+
+                    <div class="settings-cards">
+                        <!-- Profile Information -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Profile Information</h3>
+                                <p>Update your personal details and contact information</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="profile-section">
+                                    <div class="profile-avatar">
+                                        <img id="profileAvatar" src="https://ui-avatars.com/api/?name=John+Doe&background=4F709C&color=fff" alt="Profile Avatar">
+                                        <button class="avatar-upload-btn">Change Photo</button>
+                                        <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                                    </div>
+                                    <div class="profile-form">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>First Name</label>
+                                                <input type="text" id="firstName" class="form-input" value="John">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Last Name</label>
+                                                <input type="text" id="lastName" class="form-input" value="Doe">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email Address</label>
+                                            <input type="email" id="emailAddress" class="form-input" value="john.doe@company.com">
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>Job Title</label>
+                                                <input type="text" id="jobTitle" class="form-input" value="Security Analyst">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Company</label>
+                                                <input type="text" id="company" class="form-input" value="Acme Corp">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Phone Number</label>
+                                            <input type="tel" id="phoneNumber" class="form-input" value="+1 (555) 123-4567">
+                                        </div>
+                                        <div class="form-actions">
+                                            <button id="saveProfile" class="btn-primary">Save Changes</button>
+                                            <button id="cancelProfile" class="btn-secondary">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Status -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Account Status</h3>
+                                <p>View your account status and verification details</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="status-items">
+                                    <div class="status-item">
+                                        <div class="status-info">
+                                            <div class="status-label">Email Verification</div>
+                                            <div class="status-description">Your email address is verified</div>
+                                        </div>
+                                        <div class="status-badge verified">Verified</div>
+                                    </div>
+                                    <div class="status-item">
+                                        <div class="status-info">
+                                            <div class="status-label">Two-Factor Authentication</div>
+                                            <div class="status-description">Additional security for your account</div>
+                                        </div>
+                                        <div class="status-badge enabled">Enabled</div>
+                                    </div>
+                                    <div class="status-item">
+                                        <div class="status-info">
+                                            <div class="status-label">Account Type</div>
+                                            <div class="status-description">Your current subscription plan</div>
+                                        </div>
+                                        <div class="status-badge pro">Pro Plan</div>
+                                    </div>
+                                    <div class="status-item">
+                                        <div class="status-info">
+                                            <div class="status-label">Member Since</div>
+                                            <div class="status-description">Account creation date</div>
+                                        </div>
+                                        <div class="status-value">January 15, 2024</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div id="security-section" class="settings-section">
+                    <div class="section-header">
+                        <h2>Security Settings</h2>
+                        <p>Manage your password, authentication, and security preferences</p>
+                    </div>
+
+                    <div class="settings-cards">
+                        <!-- Password Management -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Password & Authentication</h3>
+                                <p>Update your password and manage authentication methods</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="security-section">
+                                    <div class="form-group">
+                                        <label>Current Password</label>
+                                        <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>New Password</label>
+                                        <input type="password" id="newPassword" class="form-input" placeholder="Enter new password">
+                                        <div class="password-strength">
+                                            <div class="strength-bar">
+                                                <div class="strength-fill" id="strengthFill"></div>
+                                            </div>
+                                            <span class="strength-text" id="strengthText">Password strength</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Confirm New Password</label>
+                                        <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password">
+                                    </div>
+                                    <div class="form-actions">
+                                        <button id="changePassword" class="btn-primary">Change Password</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Two-Factor Authentication -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Two-Factor Authentication</h3>
+                                <p>Add an extra layer of security to your account</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="tfa-section">
+                                    <div class="tfa-status">
+                                        <div class="tfa-info">
+                                            <div class="tfa-icon enabled">🔐</div>
+                                            <div class="tfa-details">
+                                                <div class="tfa-title">Two-Factor Authentication is Enabled</div>
+                                                <div class="tfa-description">Your account is protected with 2FA using an authenticator app</div>
+                                            </div>
+                                        </div>
+                                        <button id="disable2FA" class="btn-secondary">Disable 2FA</button>
+                                    </div>
+                                    <div class="tfa-methods">
+                                        <div class="method-item">
+                                            <div class="method-info">
+                                                <div class="method-icon">📱</div>
+                                                <div class="method-details">
+                                                    <div class="method-name">Authenticator App</div>
+                                                    <div class="method-description">Google Authenticator, Authy, or similar</div>
+                                                </div>
+                                            </div>
+                                            <div class="method-status active">Active</div>
+                                        </div>
+                                        <div class="method-item">
+                                            <div class="method-info">
+                                                <div class="method-icon">📧</div>
+                                                <div class="method-details">
+                                                    <div class="method-name">Email Backup Codes</div>
+                                                    <div class="method-description">Receive backup codes via email</div>
+                                                </div>
+                                            </div>
+                                            <button class="method-action">Setup</button>
+                                        </div>
+                                    </div>
+                                    <div class="backup-codes">
+                                        <button id="generateBackupCodes" class="btn-secondary">Generate Backup Codes</button>
+                                        <button id="downloadBackupCodes" class="btn-secondary">Download Backup Codes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Login Sessions -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Active Sessions</h3>
+                                <p>Manage your active login sessions across devices</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="sessions-list">
+                                    <div class="session-item current">
+                                        <div class="session-info">
+                                            <div class="session-device">
+                                                <div class="device-icon">💻</div>
+                                                <div class="device-details">
+                                                    <div class="device-name">Chrome on Windows</div>
+                                                    <div class="device-location">New York, NY • Current session</div>
+                                                </div>
+                                            </div>
+                                            <div class="session-time">Active now</div>
+                                        </div>
+                                        <div class="session-badge current">Current</div>
+                                    </div>
+                                    <div class="session-item">
+                                        <div class="session-info">
+                                            <div class="session-device">
+                                                <div class="device-icon">📱</div>
+                                                <div class="device-details">
+                                                    <div class="device-name">Safari on iPhone</div>
+                                                    <div class="device-location">New York, NY</div>
+                                                </div>
+                                            </div>
+                                            <div class="session-time">2 hours ago</div>
+                                        </div>
+                                        <button class="session-action">Revoke</button>
+                                    </div>
+                                    <div class="session-item">
+                                        <div class="session-info">
+                                            <div class="session-device">
+                                                <div class="device-icon">💻</div>
+                                                <div class="device-details">
+                                                    <div class="device-name">Firefox on macOS</div>
+                                                    <div class="device-location">San Francisco, CA</div>
+                                                </div>
+                                            </div>
+                                            <div class="session-time">1 day ago</div>
+                                        </div>
+                                        <button class="session-action">Revoke</button>
+                                    </div>
+                                </div>
+                                <div class="sessions-actions">
+                                    <button id="revokeAllSessions" class="btn-secondary">Revoke All Other Sessions</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div id="notifications-section" class="settings-section">
+                    <div class="section-header">
+                        <h2>Notification Settings</h2>
+                        <p>Configure how and when you receive notifications</p>
+                    </div>
+
+                    <div class="settings-cards">
+                        <!-- Email Notifications -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Email Notifications</h3>
+                                <p>Choose which email notifications you want to receive</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="notification-items">
+                                    <div class="notification-item">
+                                        <div class="notification-info">
+                                            <div class="notification-title">Threat Alerts</div>
+                                            <div class="notification-description">High-priority security threats and suspicious activity</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="notification-item">
+                                        <div class="notification-info">
+                                            <div class="notification-title">Weekly Reports</div>
+                                            <div class="notification-description">Summary of weekly activity and statistics</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="notification-item">
+                                        <div class="notification-info">
+                                            <div class="notification-title">System Updates</div>
+                                            <div class="notification-description">New features, maintenance, and system announcements</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="notification-item">
+                                        <div class="notification-info">
+                                            <div class="notification-title">Account Activity</div>
+                                            <div class="notification-description">Login attempts, password changes, and account updates</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="notification-item">
+                                        <div class="notification-info">
+                                            <div class="notification-title">Marketing & Tips</div>
+                                            <div class="notification-description">Product updates, tips, and promotional content</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Push Notifications -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Push Notifications</h3>
+                                <p>Manage browser and mobile push notifications</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="push-section">
+                                    <div class="push-status">
+                                        <div class="push-info">
+                                            <div class="push-icon">🔔</div>
+                                            <div class="push-details">
+                                                <div class="push-title">Browser Notifications</div>
+                                                <div class="push-description">Receive real-time alerts in your browser</div>
+                                            </div>
+                                        </div>
+                                        <button id="enablePushNotifications" class="btn-primary">Enable Notifications</button>
+                                    </div>
+                                    <div class="notification-items">
+                                        <div class="notification-item">
+                                            <div class="notification-info">
+                                                <div class="notification-title">Critical Threats</div>
+                                                <div class="notification-description">Immediate alerts for high-risk threats</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="notification-item">
+                                            <div class="notification-info">
+                                                <div class="notification-title">Analysis Complete</div>
+                                                <div class="notification-description">When email analysis is finished</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="notification-item">
+                                            <div class="notification-info">
+                                                <div class="notification-title">Team Activity</div>
+                                                <div class="notification-description">When team members perform important actions</div>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alert Preferences -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Alert Preferences</h3>
+                                <p>Customize how alerts are delivered and displayed</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="alert-preferences">
+                                    <div class="form-group">
+                                        <label>Alert Frequency</label>
+                                        <select class="form-select">
+                                            <option value="immediate">Immediate</option>
+                                            <option value="hourly">Hourly Digest</option>
+                                            <option value="daily">Daily Digest</option>
+                                            <option value="weekly">Weekly Digest</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Minimum Threat Level</label>
+                                        <select class="form-select">
+                                            <option value="low">Low Risk and Above</option>
+                                            <option value="medium" selected>Medium Risk and Above</option>
+                                            <option value="high">High Risk Only</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Quiet Hours</label>
+                                        <div class="time-range">
+                                            <input type="time" class="form-input" value="22:00">
+                                            <span>to</span>
+                                            <input type="time" class="form-input" value="08:00">
+                                        </div>
+                                        <div class="form-description">No notifications during these hours</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences Settings -->
+                <div id="preferences-section" class="settings-section">
+                    <div class="section-header">
+                        <h2>Preferences</h2>
+                        <p>Customize your dashboard experience and interface settings</p>
+                    </div>
+
+                    <div class="settings-cards">
+                        <!-- Interface Preferences -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Interface & Display</h3>
+                                <p>Customize how the dashboard looks and behaves</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="preference-items">
+                                    <div class="preference-item">
+                                        <div class="preference-info">
+                                            <div class="preference-title">Theme</div>
+                                            <div class="preference-description">Choose your preferred color scheme</div>
+                                        </div>
+                                        <select class="preference-select">
+                                            <option value="dark" selected>Dark Theme</option>
+                                            <option value="light">Light Theme</option>
+                                            <option value="auto">Auto (System)</option>
+                                        </select>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-info">
+                                            <div class="preference-title">Language</div>
+                                            <div class="preference-description">Select your preferred language</div>
+                                        </div>
+                                        <select class="preference-select">
+                                            <option value="en" selected>English</option>
+                                            <option value="es">Español</option>
+                                            <option value="fr">Français</option>
+                                            <option value="de">Deutsch</option>
+                                            <option value="ja">日本語</option>
+                                        </select>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-info">
+                                            <div class="preference-title">Timezone</div>
+                                            <div class="preference-description">Your local timezone for dates and times</div>
+                                        </div>
+                                        <select class="preference-select">
+                                            <option value="America/New_York" selected>Eastern Time (ET)</option>
+                                            <option value="America/Chicago">Central Time (CT)</option>
+                                            <option value="America/Denver">Mountain Time (MT)</option>
+                                            <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                            <option value="UTC">UTC</option>
+                                        </select>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-info">
+                                            <div class="preference-title">Date Format</div>
+                                            <div class="preference-description">How dates are displayed throughout the app</div>
+                                        </div>
+                                        <select class="preference-select">
+                                            <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dashboard Preferences -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Dashboard Settings</h3>
+                                <p>Configure your dashboard layout and default views</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="dashboard-preferences">
+                                    <div class="preference-item">
+                                        <div class="preference-info">
+                                            <div class="preference-title">Default Page</div>
+                                            <div class="preference-description">Page to show when you log in</div>
+                                        </div>
+                                        <select class="preference-select">
+                                            <option value="overview" selected>Overview</option>
+                                            <option value="analysis">Analysis</option>
+                                            <option value="history">History</option>
+                                            <option value="threats">Threats</option>
+                                        </select>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-info">
+                                            <div class="preference-title">Items Per Page</div>
+                                            <div class="preference-description">Number of items to show in lists</div>
+                                        </div>
+                                        <select class="preference-select">
+                                            <option value="10">10 items</option>
+                                            <option value="25" selected>25 items</option>
+                                            <option value="50">50 items</option>
+                                            <option value="100">100 items</option>
+                                        </select>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-info">
+                                            <div class="preference-title">Auto-refresh</div>
+                                            <div class="preference-description">Automatically refresh data</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-info">
+                                            <div class="preference-title">Show Tooltips</div>
+                                            <div class="preference-description">Display helpful tooltips and hints</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy & Data Settings -->
+                <div id="privacy-section" class="settings-section">
+                    <div class="section-header">
+                        <h2>Privacy & Data</h2>
+                        <p>Control your data privacy and manage your information</p>
+                    </div>
+
+                    <div class="settings-cards">
+                        <!-- Data Management -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Data Management</h3>
+                                <p>Export, backup, or delete your data</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="data-actions">
+                                    <div class="data-item">
+                                        <div class="data-info">
+                                            <div class="data-icon">📥</div>
+                                            <div class="data-details">
+                                                <div class="data-title">Export Data</div>
+                                                <div class="data-description">Download all your data in JSON format</div>
+                                            </div>
+                                        </div>
+                                        <button id="exportData" class="btn-secondary">Export</button>
+                                    </div>
+                                    <div class="data-item">
+                                        <div class="data-info">
+                                            <div class="data-icon">💾</div>
+                                            <div class="data-details">
+                                                <div class="data-title">Backup Settings</div>
+                                                <div class="data-description">Create a backup of your preferences and settings</div>
+                                            </div>
+                                        </div>
+                                        <button id="backupSettings" class="btn-secondary">Backup</button>
+                                    </div>
+                                    <div class="data-item">
+                                        <div class="data-info">
+                                            <div class="data-icon">🗑️</div>
+                                            <div class="data-details">
+                                                <div class="data-title">Delete Account</div>
+                                                <div class="data-description">Permanently delete your account and all data</div>
+                                            </div>
+                                        </div>
+                                        <button id="deleteAccount" class="btn-danger">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Privacy Controls -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>Privacy Controls</h3>
+                                <p>Manage how your data is used and shared</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="privacy-items">
+                                    <div class="privacy-item">
+                                        <div class="privacy-info">
+                                            <div class="privacy-title">Analytics & Usage Data</div>
+                                            <div class="privacy-description">Help improve our service by sharing anonymous usage data</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="privacy-item">
+                                        <div class="privacy-info">
+                                            <div class="privacy-title">Error Reporting</div>
+                                            <div class="privacy-description">Automatically send error reports to help us fix issues</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="privacy-item">
+                                        <div class="privacy-info">
+                                            <div class="privacy-title">Data Retention</div>
+                                            <div class="privacy-description">How long to keep your analysis history</div>
+                                        </div>
+                                        <select class="privacy-select">
+                                            <option value="30">30 days</option>
+                                            <option value="90" selected>90 days</option>
+                                            <option value="365">1 year</option>
+                                            <option value="forever">Forever</option>
+                                        </select>
+                                    </div>
+                                    <div class="privacy-item">
+                                        <div class="privacy-info">
+                                            <div class="privacy-title">Third-party Integrations</div>
+                                            <div class="privacy-description">Allow data sharing with connected services</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div id="advanced-section" class="settings-section">
+                    <div class="section-header">
+                        <h2>Advanced Settings</h2>
+                        <p>Developer options and advanced configuration</p>
+                    </div>
+
+                    <div class="settings-cards">
+                        <!-- API & Integrations -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>API & Developer Tools</h3>
+                                <p>Manage API keys and developer settings</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="api-section">
+                                    <div class="api-keys">
+                                        <div class="api-key-item">
+                                            <div class="api-key-info">
+                                                <div class="api-key-name">Production API Key</div>
+                                                <div class="api-key-value">pk_live_••••••••••••••••••••••••••••••••</div>
+                                                <div class="api-key-created">Created: Oct 15, 2024</div>
+                                            </div>
+                                            <div class="api-key-actions">
+                                                <button class="api-action-btn">Copy</button>
+                                                <button class="api-action-btn">Regenerate</button>
+                                                <button class="api-action-btn danger">Revoke</button>
+                                            </div>
+                                        </div>
+                                        <div class="api-key-item">
+                                            <div class="api-key-info">
+                                                <div class="api-key-name">Test API Key</div>
+                                                <div class="api-key-value">pk_test_••••••••••••••••••••••••••••••••</div>
+                                                <div class="api-key-created">Created: Oct 10, 2024</div>
+                                            </div>
+                                            <div class="api-key-actions">
+                                                <button class="api-action-btn">Copy</button>
+                                                <button class="api-action-btn">Regenerate</button>
+                                                <button class="api-action-btn danger">Revoke</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="api-actions">
+                                        <button id="generateApiKey" class="btn-primary">Generate New API Key</button>
+                                        <button id="viewApiDocs" class="btn-secondary">View API Documentation</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Preferences -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>System Preferences</h3>
+                                <p>Advanced system configuration and debugging</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="system-preferences">
+                                    <div class="system-item">
+                                        <div class="system-info">
+                                            <div class="system-title">Debug Mode</div>
+                                            <div class="system-description">Enable detailed logging and debug information</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="system-item">
+                                        <div class="system-info">
+                                            <div class="system-title">Beta Features</div>
+                                            <div class="system-description">Access experimental features and early releases</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="system-item">
+                                        <div class="system-info">
+                                            <div class="system-title">Performance Monitoring</div>
+                                            <div class="system-description">Monitor system performance and resource usage</div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="system-item">
+                                        <div class="system-info">
+                                            <div class="system-title">Cache Management</div>
+                                            <div class="system-description">Clear application cache and temporary files</div>
+                                        </div>
+                                        <button id="clearCache" class="btn-secondary">Clear Cache</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Delete Account Confirmation Modal -->
+            <div id="deleteAccountModal" class="modal-overlay">
+                <div class="modal-content delete-account-modal">
+                    <div class="modal-header">
+                        <h2>Delete Account</h2>
+                        <button class="modal-close" onclick="closeDeleteAccountModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="delete-warning">
+                            <div class="warning-icon">⚠️</div>
+                            <div class="warning-content">
+                                <h3>This action cannot be undone</h3>
+                                <p>Deleting your account will permanently remove:</p>
+                                <ul>
+                                    <li>All your email analysis history</li>
+                                    <li>Saved reports and configurations</li>
+                                    <li>Team memberships and permissions</li>
+                                    <li>Billing history and subscription data</li>
+                                    <li>All personal data and preferences</li>
+                                </ul>
+                                <p>Type <strong>DELETE</strong> to confirm:</p>
+                                <input type="text" id="deleteConfirmation" class="form-input" placeholder="Type DELETE to confirm">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" onclick="closeDeleteAccountModal()">Cancel</button>
+                        <button id="confirmDeleteAccount" class="btn-danger" disabled>Delete Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Google API Client -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- Gmail Configuration -->
+    <script src="gmail-config.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="dashboard.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>
+

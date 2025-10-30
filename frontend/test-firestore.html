@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firestore Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Firestore Database Test</h1>
+    
+    <div>
+        <button id="testWrite">Test Write to Firestore</button>
+        <button id="testRead">Test Read from Firestore</button>
+        <button id="testUpdate">Test Update User Data</button>
+    </div>
+    
+    <div id="status"></div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsMfis_O6zi9_2b_a3MvFFzAH0xga8h_M",
+            authDomain: "phishing-detection-ai.firebaseapp.com",
+            projectId: "phishing-detection-ai",
+            storageBucket: "phishing-detection-ai.firebasestorage.app",
+            messagingSenderId: "360977256914",
+            appId: "1:360977256914:web:383f60bde5b0d9515a780b",
+            measurementId: "G-CGLMJMPN9J"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const statusDiv = document.getElementById('status');
+
+        function showStatus(message, isError = false, isInfo = false) {
+            const className = isError ? 'error' : (isInfo ? 'info' : 'success');
+            statusDiv.innerHTML = `<div class="${className}">${message}</div>`;
+        }
+
+        // Test Write
+        document.getElementById('testWrite').addEventListener('click', async () => {
+            try {
+                showStatus('Testing Firestore write...', false, true);
+                
+                if (!auth.currentUser) {
+                    showStatus('Please sign in first', true);
+                    return;
+                }
+
+                const testData = {
+                    message: 'Hello Firestore!',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    userId: auth.currentUser.uid
+                };
+
+                await db.collection('test').add(testData);
+                showStatus('✅ Firestore write successful!');
+            } catch (error) {
+                showStatus(`❌ Firestore write failed: ${error.message}`, true);
+                console.error('Firestore write error:', error);
+            }
+        });
+
+        // Test Read
+        document.getElementById('testRead').addEventListener('click', async () => {
+            try {
+                showStatus('Testing Firestore read...', false, true);
+                
+                const snapshot = await db.collection('test').limit(5).get();
+                const docs = snapshot.docs.map(doc => doc.data());
+                
+                showStatus(`✅ Firestore read successful! Found ${docs.length} documents`);
+                console.log('Documents:', docs);
+            } catch (error) {
+                showStatus(`❌ Firestore read failed: ${error.message}`, true);
+                console.error('Firestore read error:', error);
+            }
+        });
+
+        // Test Update User Data
+        document.getElementById('testUpdate').addEventListener('click', async () => {
+            try {
+                showStatus('Testing user data update...', false, true);
+                
+                if (!auth.currentUser) {
+                    showStatus('Please sign in first', true);
+                    return;
+                }
+
+                const userRef = db.collection('users').doc(auth.currentUser.uid);
+                await userRef.update({
+                    lastTest: firebase.firestore.FieldValue.serverTimestamp(),
+                    testCount: firebase.firestore.FieldValue.increment(1)
+                });
+
+                showStatus('✅ User data update successful!');
+            } catch (error) {
+                showStatus(`❌ User data update failed: ${error.message}`, true);
+                console.error('User update error:', error);
+            }
+        });
+
+        // Auth state listener
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                showStatus(`✅ Signed in as: ${user.email}`, false, true);
+            } else {
+                showStatus('❌ Not signed in', true);
+            }
+        });
+    </script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

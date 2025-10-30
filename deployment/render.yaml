@@ -1,0 +1,14 @@
+
+services:
+  - type: web
+    name: phishing-detection-ai-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 3000
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: DB_NAME
+        value: phishing_ai
+    rootDir: backend

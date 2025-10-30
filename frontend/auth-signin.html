@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="styles.css?v=auth1">
+    <style>
+      :root{--blue:#2a4a78;--navy:#042d64;--accent:#ff7c01}
+      body{background:#213555;color:#1e293b;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+      .auth-shell{min-height:100vh;display:grid;place-items:center;padding:2rem}
+      .card{width:100%;max-width:420px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:1.75rem}
+      .title{font-size:1.75rem;font-weight:700;color:var(--navy);text-align:center;margin-bottom:.25rem}
+      .subtitle{font-size:.95rem;color:#6b7280;text-align:center;margin-bottom:1.25rem}
+      .field{margin-bottom:1rem}
+      .label{display:block;font-size:.9rem;font-weight:600;margin-bottom:.4rem;color:#334155}
+      .input-wrap{position:relative}
+      .input{width:100%;padding:.85rem 2.75rem .85rem 1rem;border:none;border-radius:10px;background:#e8f0fe;color:#111827;font-size:.95rem;transition:.2s}
+      .input:hover{background:#dce9ff}
+      .input:focus{outline:none;background:#d2e2ff;box-shadow:0 0 0 2px rgba(42,74,120,.25)}
+      .eye{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:.25rem;color:#334155}
+      .eye svg{width:20px;height:20px}
+      .err{display:none;color:#b91c1c;font-size:.8rem;margin-top:.4rem}
+      .btn{width:100%;padding:.9rem 1rem;border:none;border-radius:10px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;transition:.2s}
+      .btn:hover{filter:brightness(1.05)}
+      .row{display:flex;justify-content:space-between;align-items:center;margin:.5rem 0 1rem}
+      .link{color:var(--blue);text-decoration:none;font-weight:600}
+      .foot{text-align:center;margin-top:1rem;font-size:.9rem;color:#6b7280}
+      .foot a{color:var(--blue);font-weight:700;text-decoration:none}
+      .toast{display:none;margin-bottom:.75rem;padding:.75rem;border-radius:10px;font-size:.9rem}
+      .toast.err{display:block;background:#fef2f2;color:#b91c1c}
+      .two-col{display:grid;grid-template-columns:1.1fr .9fr;gap:0;overflow:hidden;border-radius:16px}
+      .left-pane{display:none}
+      .left-pane img{width:100%;height:100%;object-fit:cover}
+      @media(min-width:900px){.card{padding:0}.two-col{max-width:900px}.left-pane{display:block;background:#0b1e3d}}
+      .right-pane{padding:1.75rem}
+      .google{width:100%;margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid #e5e7eb;border-radius:10px;padding:.8rem;cursor:pointer;background:#fff;color:#111827;font-weight:700}
+      .google img{width:18px;height:18px}
+    </style>
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="card two-col">
+      <div class="left-pane"><img src="Photos/signin.png" alt="Sign in"/></div>
+      <div class="right-pane">
+      <div class="title">Sign In</div>
+      <div class="subtitle">Access your secure dashboard</div>
+      <div id="toast" class="toast"></div>
+      <!-- Email/password form -->
+      <div>
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <div class="input-wrap">
+            <input id="email" type="email" class="input" autocomplete="email" />
+          </div>
+          <div id="emailErr" class="err"></div>
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <div class="input-wrap">
+            <input id="password" type="password" class="input" autocomplete="current-password" />
+            <button id="pwEye" class="eye" aria-label="Show password" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div id="passwordErr" class="err"></div>
+        </div>
+        <div class="row">
+          <span></span>
+          <a class="link" href="auth-reset.html">Forgot password?</a>
+        </div>
+        <button id="submit" class="btn">Sign In</button>
+      </div>
+      <button id="googleBtn" class="google" type="button"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt=""/> Continue with Google</button>
+      <div class="foot">Don’t have an account? <a href="auth-signup.html">Create one</a></div>
+      </div>
+    </div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="js/auth-common.js?v=2"></script>
+  <script>
+    const emailEl = document.getElementById('email');
+    const pwEl = document.getElementById('password');
+    const emailErr = document.getElementById('emailErr');
+    const pwErr = document.getElementById('passwordErr');
+    const toast = document.getElementById('toast');
+
+    Auth.togglePasswordVisibility(document.getElementById('pwEye'), pwEl);
+
+    function setToast(msg){
+      toast.textContent = msg || '';
+      toast.className = msg ? 'toast err' : 'toast';
+    }
+
+    // Email/password login
+    document.getElementById('submit').addEventListener('click', async () => {
+      setToast('');
+      Auth.showInlineError(emailErr, '');
+      Auth.showInlineError(pwErr, '');
+
+      const email = emailEl.value.trim();
+      const password = pwEl.value;
+      let ok = true;
+      if (!Auth.validateEmail(email)) { Auth.showInlineError(emailErr, 'Enter a valid email'); ok = false; }
+      if (!password) { Auth.showInlineError(pwErr, 'Enter your password'); ok = false; }
+      if (!ok) return;
+      try {
+        const res = await Auth.postJSON('/api/auth/login', { email, password });
+        if (res?.token) localStorage.setItem('JWT', res.token);
+        // Store for dashboard offline fallback
+        localStorage.setItem('AUTH_EMAIL', email);
+        window.location.replace('dashboard.html');
+      } catch (e) {
+        const m = e?.message || e?.detail?.message || 'Login failed';
+        setToast(m);
+      }
+    });
+
+    // Google Sign-in with backend fallback
+    document.getElementById('googleBtn').addEventListener('click', async () => {
+      try{
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await firebase.auth().signInWithPopup(provider);
+        // Persist email for dashboard offline fallback
+        localStorage.setItem('AUTH_EMAIL', result?.user?.email || '');
+        try {
+          const idToken = await result.user.getIdToken();
+          const r = await Auth.postJSON('/api/auth/google', { token: idToken });
+          if (r?.token) localStorage.setItem('JWT', r.token);
+        } catch (be) {
+          // Backend not available – set mock JWT and continue
+          localStorage.setItem('JWT', 'mock_google_jwt_' + Date.now());
+        }
+        window.location.replace('dashboard.html');
+      }catch(e){ setToast(e?.message || 'Google sign-in failed'); }
+    });
+  </script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+# ========================
+# 🐍 Python
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variable files
+.env
+.env.*
+*.env
+
+# ========================
+# ⚛️ Node / Frontend
+# ========================
+node_modules/
+dist/
+build/
+
+# ========================
+# 🧰 macOS / IDE / Editor files
+# ========================
+.DS_Store
+.idea/
+.vscode/
+*.code-workspace
+
+# ========================
+# 🪵 Logs and temp files
+# ========================
+*.log
+logs/
+*.pid
+*.seed
+*.cover
+
+# ========================
+# 📦 Other optional stuff (you can keep or remove)
+# ========================
+# Jupyter / Python notebook checkpoints
+.ipynb_checkpoints/
+
+# Local test / coverage reports
+.coverage
+htmlcov/

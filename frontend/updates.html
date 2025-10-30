@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Threat Updates - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=4">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <style>
+        /* Full-page design - no containers */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .updates-main {
+            margin-top: 80px;
+            padding: 0;
+            background: transparent;
+        }
+        
+        /* Enhanced Header */
+        .enhanced-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(247, 250, 252, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 2rem;
+        }
+        
+        .enhanced-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 1rem 0;
+        }
+        
+        .enhanced-header p {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 2rem;
+        }
+        
+        /* Enhanced Controls */
+        .enhanced-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .search-container {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .search-container input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .enhanced-controls select {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            background: white;
+            font-size: 1rem;
+            min-width: 150px;
+            transition: all 0.3s ease;
+        }
+        
+        .enhanced-controls select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .refresh-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Threat Statistics Dashboard */
+        .threat-stats {
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+        }
+        
+        .stat-icon {
+            font-size: 3rem;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            color: white;
+        }
+        
+        .stat-content h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-content p {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin: 0.5rem 0 0 0;
+            font-weight: 500;
+        }
+        
+        /* Threat Chart Section */
+        .threat-chart {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            margin: 2rem;
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .threat-chart h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+        
+        /* News Feed Rows */
+        .news-feeds {
+            padding: 0 2rem 2rem 2rem;
+        }
+        
+        .feed-row {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .feed-row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+        }
+        
+        .feed-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .feed-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .feed-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .feed-content {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* Enhanced Threat Cards */
+        .threat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .threat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .threat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+            border-color: #667eea;
+        }
+        
+        .threat-card .meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .threat-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            color: #2d3748;
+            line-height: 1.4;
+        }
+        
+        .threat-card p {
+            color: #4a5568;
+            margin: 0 0 1rem 0;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .threat-card .badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .threat-card .badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .threat-card .read-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .threat-card .read-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Modern styling for threat cards */
+        .th-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .th-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+        
+        .th-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .th-card:hover::before {
+            opacity: 1;
+        }
+        
+        .th-card h3 {
+            color: #1a202c;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+        
+        .th-card p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .th-card .meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: #718096;
+        }
+        
+        .th-card .meta span:first-child {
+            font-weight: 500;
+            color: #667eea;
+        }
+        
+        .badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        .th-card a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .th-card a:hover {
+            color: #764ba2;
+            transform: translateX(4px);
+        }
+        
+        .th-card a::after {
+            content: '→';
+            transition: transform 0.3s ease;
+        }
+        
+        .th-card a:hover::after {
+            transform: translateX(4px);
+        }
+        
+        .read-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: inherit;
+            padding: 0;
+        }
+        
+        .read-btn:hover {
+            color: #764ba2;
+            transform: translateX(4px);
+        }
+        
+        .read-btn::after {
+            content: '→';
+            transition: transform 0.3s ease;
+        }
+        
+        .read-btn:hover::after {
+            transform: translateX(4px);
+        }
+        
+        /* Modern grid layout */
+        .th-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        /* Enhanced controls */
+        .th-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .th-controls input,
+        .th-controls select {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: #1a202c !important; /* Force black text */
+        }
+        
+        .th-controls input::placeholder {
+            color: #718096 !important; /* Placeholder text color */
+        }
+        
+        .th-controls input:focus,
+        .th-controls select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            color: #1a202c !important; /* Ensure text stays black when focused */
+        }
+        
+        .th-controls button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .th-controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        
+        .threat-modal {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .threat-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .threat-modal .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .threat-modal .modal-body {
+            padding: 2rem;
+        }
+        
+        .threat-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .source-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .time-badge {
+            background: #f7fafc;
+            color: #4a5568;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .threat-summary {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+        }
+        
+        .threat-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .threat-tags .badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        .threat-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        /* Navigation links should use nav-link styling from main CSS */
+        .nav-link {
+            color: #4a5568 !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 12px !important;
+            transition: all 0.3s ease !important;
+            background: none !important;
+            border: none !important;
+            display: inline-block !important;
+        }
+        
+        .nav-link:hover {
+            color: #667eea !important;
+            background: rgba(102, 126, 234, 0.15) !important;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+            border: 1px solid rgba(102, 126, 234, 0.2) !important;
+        }
+        
+        .nav-link.active {
+            color: #667eea !important;
+            background: rgba(102, 126, 234, 0.2) !important;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4) !important;
+            border: 1px solid rgba(102, 126, 234, 0.3) !important;
+        }
+        
+        /* Fix overlapping issues */
+        .th-controls {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .th-grid {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .th-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .th-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .th-controls input,
+            .th-controls select,
+            .th-controls button {
+                width: 100%;
+            }
+            
+            .threat-modal {
+                margin: 1rem;
+                max-height: 90vh;
+            }
+            
+            .threat-actions {
+                flex-direction: column;
+            }
+            
+            .threat-actions .btn-primary,
+            .threat-actions .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>🛡️ Phishing Detection AI</h2>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html#features" class="nav-link">Features</a>
+                <a href="index.html#how-it-works" class="nav-link">How It Works</a>
+                <a href="index.html#pricing" class="nav-link">Pricing</a>
+                <a href="updates.html" class="nav-link active">Global Threat Updates</a>
+                <div class="nav-auth">
+                    <a href="sign-in.html" class="nav-link">Sign In</a>
+                    <a href="sign-up.html" class="nav-link">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-icon">📰</div>
+                <div class="header-text">
+                    <h1>Global Threat Updates</h1>
+                    <p>Stay informed with the latest phishing and cybersecurity threats from trusted sources worldwide</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="updates-main">
+        <!-- Enhanced Header Section -->
+        <section class="enhanced-header">
+            <div class="header-content">
+                <h1>🛡️ Global Threat Intelligence</h1>
+                <p>Real-time cybersecurity insights from trusted sources worldwide</p>
+                
+                <!-- Enhanced Controls -->
+                <div class="enhanced-controls">
+                    <div class="search-container">
+                        <input id="thSearch" placeholder="Search threats, vulnerabilities, attacks..." />
+                        <button class="search-btn">🔍</button>
+                    </div>
+                    <select id="thSource">
+                        <option value="">All Sources</option>
+                        <option value="NCSC">NCSC</option>
+                        <option value="Krebs">Krebs on Security</option>
+                        <option value="The Hacker News">The Hacker News</option>
+                        <option value="Barracuda">Barracuda</option>
+                    </select>
+                    <button id="thRefresh" class="refresh-btn">🔄 Refresh</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Threat Statistics Dashboard -->
+        <section class="threat-stats">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <h3 id="totalThreats">0</h3>
+                        <p>Total Threats</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-content">
+                        <h3 id="criticalThreats">0</h3>
+                        <p>Critical</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-content">
+                        <h3 id="activeThreats">0</h3>
+                        <p>Active</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🛡️</div>
+                    <div class="stat-content">
+                        <h3 id="blockedThreats">0</h3>
+                        <p>Blocked</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Threat Categories Bar Chart -->
+        <section class="threat-chart">
+            <h2>Threat Distribution</h2>
+            <div class="chart-container">
+                <canvas id="threatChart" width="800" height="300"></canvas>
+            </div>
+        </section>
+
+        <!-- News Feed Rows -->
+        <section class="news-feeds">
+            <!-- Row 1: Government & Official Sources -->
+            <div class="feed-row">
+                <div class="feed-header">
+                    <h3>🏛️ Government & Official Sources</h3>
+                    <span class="feed-count" id="govCount">0</span>
+                </div>
+                <div class="feed-content" id="govFeed"></div>
+            </div>
+
+            <!-- Row 2: Security Research & Analysis -->
+            <div class="feed-row">
+                <div class="feed-header">
+                    <h3>🔬 Security Research & Analysis</h3>
+                    <span class="feed-count" id="researchCount">0</span>
+                </div>
+                <div class="feed-content" id="researchFeed"></div>
+            </div>
+
+            <!-- Row 3: Enterprise Security -->
+            <div class="feed-row">
+                <div class="feed-header">
+                    <h3>🏢 Enterprise Security</h3>
+                    <span class="feed-count" id="enterpriseCount">0</span>
+                </div>
+                <div class="feed-content" id="enterpriseFeed"></div>
+            </div>
+
+            <!-- Row 4: Anti-Phishing Organizations -->
+            <div class="feed-row">
+                <div class="feed-header">
+                    <h3>🚫 Anti-Phishing Organizations</h3>
+                    <span class="feed-count" id="antiPhishCount">0</span>
+                </div>
+                <div class="feed-content" id="antiPhishFeed"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Threat Details Modal -->
+    <div id="threatModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content threat-modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Threat Details</h3>
+                <button class="modal-close" onclick="closeThreatModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="threat-meta">
+                    <span id="modalSource" class="source-badge"></span>
+                    <span id="modalTime" class="time-badge"></span>
+                </div>
+                <div id="modalSummary" class="threat-summary"></div>
+                <div class="threat-tags" id="modalTags"></div>
+                <div class="threat-actions">
+                    <a id="modalLink" href="#" target="_blank" class="btn-primary">Read Full Article</a>
+                    <button onclick="closeThreatModal()" class="btn-secondary">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🛡️ Phishing Detection AI</h3>
+                    <p>Protecting your digital life with advanced AI technology.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="index.html#features">Features</a></li>
+                        <li><a href="index.html#pricing">Pricing</a></li>
+                        <li><a href="demo.html">Demo</a></li>
+                        <li><a href="updates.html">Threat Updates</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="index.html#how-it-works">How It Works</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Phishing Detection AI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="updates.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

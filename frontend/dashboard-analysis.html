@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=41">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Google API Client -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- Gmail Configuration -->
+    <script src="gmail-config.js"></script>
+
+    <style>
+        :root {
+            --dashboard-bg: linear-gradient(180deg, #f6f8fc 0%, #eef2f8 100%);
+            --deep-blue: #213555;
+            --accent-blue: #4F709C;
+            --muted-blue: #627da0;
+            --panel-bg: #ffffff;
+            --panel-subtle-bg: #f4f6fb;
+            --panel-border: rgba(79, 112, 156, 0.18);
+            --panel-shadow: 0 12px 30px rgba(33, 53, 85, 0.08);
+        }
+
+        body.dashboard-modern {
+            background: var(--dashboard-bg);
+            color: var(--deep-blue);
+        }
+
+        .dash-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .dash-sidebar { background:#1a2a48; border-right:1px solid rgba(255,255,255,0.14); padding:18px; position:sticky; top:0; height:100vh; }
+        .dash-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; letter-spacing:.2px; }
+        .dash-nav { margin-top:18px; display:flex; flex-direction:column; gap:4px; }
+        .dash-link { color:#EAF1FB; padding:10px 12px; border-radius:10px; text-decoration:none; display:flex; align-items:center; gap:10px; border:1px solid transparent; }
+        .dash-link:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); }
+        .dash-link.active { background:rgba(255,255,255,0.10); border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.35) inset; color:#fff; }
+        .dash-hero { background:#213555; border-bottom:1px solid rgba(255,255,255,0.14); padding:24px 24px; color:#fff; }
+        .dash-hero .subtitle { color:#EAF1FB; opacity:.95; margin-top:6px; }
+        @media (max-width: 900px){ .dash-shell{ grid-template-columns: 1fr; } .dash-sidebar{ display:none; } }
+
+        /* Analysis page scoped styles */
+        .analysis-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .analysis-modes {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 24px;
+            border: 2px solid rgba(79,112,156,0.3);
+            border-radius: 16px;
+            background: #F5EFE7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #4F709C;
+        }
+
+        .mode-btn:hover {
+            border-color: #4F709C;
+            background: rgba(255,255,255,0.9);
+            transform: translateY(-2px);
+            color: #4F709C;
+        }
+
+        .mode-btn.active {
+            border-color: #4F709C;
+            background: #4F709C;
+            box-shadow: 0 4px 16px rgba(79, 112, 156, 0.3);
+            color: white;
+        }
+
+        .mode-icon {
+            font-size: 2rem;
+        }
+
+        .mode-content {
+            text-align: left;
+        }
+
+        .mode-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .mode-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .mode-panel {
+            display: none;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--panel-shadow);
+            color: var(--deep-blue);
+        }
+
+        .mode-panel.active {
+            display: block;
+        }
+
+        .input-header h3 {
+            color: #4F709C;
+            margin: 0 0 8px 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .input-header p {
+            color: #4F709C;
+            opacity: 0.8;
+            margin: 0 0 24px 0;
+        }
+
+        .email-input-container {
+            margin-bottom: 24px;
+        }
+
+        #emailContent {
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            color: #4F709C;
+            border: 1px solid rgba(79,112,156,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            resize: vertical;
+            min-height: 300px;
+            outline: none;
+        }
+
+        #emailContent:focus {
+            border-color: #4F709C;
+            box-shadow: 0 0 0 3px rgba(79,112,156,0.25);
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            color: #4F709C;
+            font-size: 0.9rem;
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .template-select {
+            background: rgba(255,255,255,0.9);
+            color: #4F709C;
+            border: 1px solid rgba(79,112,156,0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .analyze-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .primary-btn {
+            background: #4F709C;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .primary-btn:hover {
+            background: #3d5a7a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(79, 112, 156, 0.3);
+        }
+
+        .secondary-btn {
+            background: rgba(255,255,255,0.9);
+            color: #4F709C;
+            border: 1px solid rgba(79,112,156,0.3);
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255,255,255,1);
+            border-color: #4F709C;
+        }
+
+        .connect-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .connect-icon {
+            font-size: 2rem;
+        }
+
+        .connect-header h3 {
+            color: #4F709C;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .security-note {
+            margin-top: 16px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .emails-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .emails-header h3 {
+            color: #4F709C;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 48px 32px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            box-shadow: var(--panel-shadow);
+            color: var(--deep-blue);
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(79,112,156,0.2);
+            border-top: 4px solid #4F709C;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-content h3 {
+            color: var(--deep-blue);
+            margin: 0 0 8px 0;
+        }
+
+        .loading-content p {
+            color: var(--muted-blue);
+            margin: 0 0 32px 0;
+        }
+
+        .agent-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .agent-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--panel-subtle-bg);
+            border: 1px solid rgba(79, 112, 156, 0.15);
+            border-radius: 12px;
+            color: var(--deep-blue);
+        }
+
+        .step-icon {
+            font-size: 1.2rem;
+        }
+
+        .step-text {
+            flex: 1;
+            color: var(--deep-blue);
+            font-weight: 500;
+        }
+
+        .step-status {
+            color: var(--muted-blue);
+            font-size: 0.9rem;
+        }
+
+        .results-dashboard {
+            margin-top: 32px;
+            color: var(--deep-blue);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .results-header h2 {
+            color: var(--deep-blue);
+            margin: 0;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .risk-chart-container,
+        .analysis-details,
+        .email-details,
+        .recent-history {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--panel-shadow);
+            color: var(--deep-blue);
+        }
+
+        .chart-header h3,
+        .analysis-details h3,
+        .email-details h3 {
+            color: var(--deep-blue);
+            margin: 0 0 16px 0;
+            font-size: 1.1rem;
+        }
+
+        .chart-content {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .risk-summary {
+            position: absolute;
+            text-align: center;
+        }
+
+        .risk-score {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--deep-blue);
+        }
+
+        .risk-level {
+            font-size: 0.9rem;
+            color: var(--muted-blue);
+            opacity: 1;
+        }
+
+        .alert-content {
+            background: var(--panel-subtle-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            color: var(--deep-blue);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .breakdown-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--panel-subtle-bg);
+            border-radius: 8px;
+            border: 1px solid rgba(79, 112, 156, 0.12);
+            color: var(--deep-blue);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .detail-item {
+            padding: 12px;
+            background: var(--panel-subtle-bg);
+            border-radius: 8px;
+            color: var(--deep-blue);
+            border: 1px solid rgba(79, 112, 156, 0.12);
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--muted-blue);
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--deep-blue);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .history-header h3 {
+            color: var(--deep-blue);
+            margin: 0;
+        }
+
+        .view-all-link {
+            color: #4F709C;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .view-all-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .analysis-modes {
+                flex-direction: column;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mode-btn {
+                justify-content: center;
+            }
+        }
+
+        /* Gmail email items */
+        .gmail-email-item {
+            padding: 16px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--panel-shadow);
+            color: var(--deep-blue);
+        }
+
+        .gmail-email-item:hover {
+            background: var(--panel-subtle-bg);
+            border-color: rgba(79,112,156,0.3);
+            transform: translateY(-2px);
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .email-subject {
+            font-weight: 600;
+            color: var(--deep-blue);
+            flex: 1;
+        }
+
+        .email-risk {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .email-risk.risk-low { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .email-risk.risk-medium { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .email-risk.risk-high { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        .email-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--muted-blue);
+        }
+
+        .email-sender {
+            font-weight: 500;
+            color: var(--deep-blue);
+        }
+
+        .email-date {
+            opacity: 0.7;
+        }
+
+        /* History items */
+        .history-item {
+            padding: 12px;
+            background: var(--panel-subtle-bg);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(79, 112, 156, 0.12);
+            color: var(--deep-blue);
+        }
+
+        .history-subject {
+            font-weight: 600;
+            color: var(--deep-blue);
+            margin-bottom: 4px;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .history-risk {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .history-date {
+            color: var(--muted-blue);
+            opacity: 0.7;
+        }
+
+        .no-history {
+            text-align: center;
+            color: var(--muted-blue);
+            opacity: 0.7;
+            padding: 24px;
+            font-style: italic;
+        }
+
+        /* Alert styling */
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+        }
+
+        .alert-level {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .alert-text {
+            line-height: 1.5;
+        }
+
+        .alert-content.alert-high {
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-content.alert-medium {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-content.alert-low {
+            border-left: 4px solid #10b981;
+        }
+
+        /* Breakdown items */
+        .breakdown-value {
+            font-size: 0.9rem;
+            color: var(--muted-blue);
+        }
+
+        .error-message {
+            text-align: center;
+            color: #ef4444;
+            padding: 16px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-container {
+                padding: 16px;
+            }
+            
+            .mode-panel {
+                padding: 20px;
+            }
+            
+            .results-actions {
+                flex-direction: column;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-modern">
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">Phishing Detection AI</div>
+            <nav class="dash-nav">
+                <a class="dash-link" href="dashboard.html">Overview</a>
+                <a class="dash-link active" href="dashboard-analysis.html">Analysis</a>
+                <a class="dash-link" href="dashboard-history.html">History</a>
+                <a class="dash-link" href="dashboard-threats.html">Threats</a>
+                <a class="dash-link" href="dashboard-reports.html">Reports</a>
+                <a class="dash-link" href="dashboard-integrations.html">Integrations</a>
+                <a class="dash-link" href="dashboard-team.html">Team</a>
+                <a class="dash-link" href="dashboard-plan.html">Plan & Billing</a>
+                <a class="dash-link" href="dashboard-settings.html">Settings</a>
+                <a class="dash-link" href="updates.html">Support</a>
+            </nav>
+        </aside>
+        <div>
+            <div class="dash-hero">
+                <h1 style="margin:0">Advanced Email Analysis</h1>
+                <div class="subtitle">Inspect any email with AI-powered risk detection.</div>
+            </div>
+            <main class="dashboard-main" style="padding: 24px;">
+                <div class="analysis-container">
+                    <!-- Mode Selection Header -->
+                    <div class="analysis-modes">
+                        <button class="mode-btn active" data-mode="manual">
+                            <div class="mode-icon">📝</div>
+                            <div class="mode-content">
+                                <div class="mode-title">Manual Mode</div>
+                                <div class="mode-desc">Copy-paste email content</div>
+                            </div>
+                        </button>
+                        <button class="mode-btn" data-mode="gmail">
+                            <div class="mode-icon">📬</div>
+                            <div class="mode-content">
+                                <div class="mode-title">Gmail Mode</div>
+                                <div class="mode-desc">Connect & analyze automatically</div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Manual Mode Panel -->
+                    <div class="mode-panel active" id="manual-mode">
+                        <div class="input-section">
+                            <div class="input-header">
+                                <h3>Paste Raw Email Content</h3>
+                                <p>Copy the complete email source (including headers) for comprehensive analysis</p>
+                            </div>
+                            <div class="email-input-container">
+                                <textarea id="emailContent" rows="12" placeholder="Paste the complete email source here...
+
+Example:
+From: sender@example.com
+To: you@yourdomain.com
+Subject: Urgent: Verify Your Account
+Date: Mon, 25 Oct 2025 10:30:00 +0000
+
+Dear Customer,
+
+Your account has been suspended due to suspicious activity..."></textarea>
+                                <div class="input-footer">
+                                    <div class="char-count">0 characters</div>
+                                    <div class="template-actions">
+                                        <select id="templateSelect" class="template-select">
+                                            <option value="">Load Sample Email...</option>
+                                            <option value="phishing">Phishing Example</option>
+                                            <option value="legitimate">Legitimate Example</option>
+                                            <option value="suspicious">Suspicious Example</option>
+                                        </select>
+                                        <button id="loadTemplate" class="secondary-btn">Load</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="analyze-actions">
+                                <button id="analyzeBtn" class="primary-btn">
+                                    <span class="btn-icon">🔍</span>
+                                    <span class="btn-text">Start Free Analysis</span>
+                                </button>
+                                <button id="clearBtn" class="secondary-btn">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gmail Mode Panel -->
+                    <div class="mode-panel" id="gmail-mode">
+                        <div class="gmail-connect">
+                            <div class="connect-status" id="gmailStatus">
+                                <div class="connect-header">
+                                    <div class="connect-icon">🔗</div>
+                                    <h3>Connect Your Gmail Account</h3>
+                                </div>
+                                <p style="color: #4F709C;">Securely connect via OAuth to analyze your emails automatically. We only read email metadata and content for analysis.</p>
+                                <button id="connectGmailBtn" class="primary-btn">
+                                    <span class="btn-icon">📧</span>
+                                    <span class="btn-text">Connect Gmail</span>
+                                </button>
+                                <div class="security-note">
+                                    <small style="color: #4F709C;">🔒 Your data is processed securely and never stored permanently</small>
+                                </div>
+                            </div>
+                            <div class="gmail-emails" id="gmailEmails" style="display:none;">
+                                <div class="emails-header">
+                                    <h3>Recent Emails</h3>
+                                    <button id="refreshEmails" class="secondary-btn">Refresh</button>
+                                </div>
+                                <div class="emails-list" id="emailsList">
+                                    <!-- Gmail emails will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="loading-state" id="loadingState" style="display:none;">
+                        <div class="loading-content">
+                            <div class="loading-spinner"></div>
+                            <h3>Analyzing Email...</h3>
+                            <p>Our AI agents are working together to analyze your email</p>
+                            <div class="agent-steps">
+                                <div class="agent-step" id="step-parser">
+                                    <span class="step-icon">📝</span>
+                                    <span class="step-text">Email Parser Agent</span>
+                                    <span class="step-status">Processing...</span>
+                                </div>
+                                <div class="agent-step" id="step-scorer">
+                                    <span class="step-icon">🧠</span>
+                                    <span class="step-text">Risk Scorer Agent</span>
+                                    <span class="step-status">Waiting...</span>
+                                </div>
+                                <div class="agent-step" id="step-alert">
+                                    <span class="step-icon">🚨</span>
+                                    <span class="step-text">Alert Generator Agent</span>
+                                    <span class="step-status">Waiting...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Dashboard -->
+                    <div class="results-dashboard" id="resultsDashboard" style="display:none;">
+                        <div class="results-header">
+                            <h2>Analysis Results</h2>
+                            <div class="results-actions">
+                                <button id="analyzeAnother" class="secondary-btn">Analyze Another</button>
+                                <button id="exportResults" class="secondary-btn">Export Results</button>
+                            </div>
+                        </div>
+
+                        <div class="results-grid">
+                            <!-- Risk Level Donut Chart -->
+                            <div class="risk-chart-container">
+                                <div class="chart-header">
+                                    <h3>Risk Assessment</h3>
+                                </div>
+                                <div class="chart-content">
+                                    <canvas id="riskChart" width="200" height="200"></canvas>
+                                    <div class="risk-summary">
+                                        <div class="risk-score" id="riskScore">0</div>
+                                        <div class="risk-level" id="riskLevel">Analyzing...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Analysis Details -->
+                            <div class="analysis-details">
+                                <div class="alert-summary" id="alertSummary">
+                                    <h3>Alert Summary</h3>
+                                    <div class="alert-content">
+                                        <!-- Alert Generator output -->
+                                    </div>
+                                </div>
+                                <div class="analysis-breakdown">
+                                    <h3>Detection Breakdown</h3>
+                                    <div class="breakdown-items" id="breakdownItems">
+                                        <!-- Parser + Scorer + Alert details -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email Details -->
+                            <div class="email-details">
+                                <h3>Email Analysis</h3>
+                                <div class="detail-grid" id="emailDetailGrid">
+                                    <!-- Email parsing details -->
+                                </div>
+                            </div>
+
+                            <!-- Recent History -->
+                            <div class="recent-history">
+                                <div class="history-header">
+                                    <h3>Recent Analysis History</h3>
+                                    <a href="dashboard-history.html" class="view-all-link">View All</a>
+                                </div>
+                                <div class="history-items" id="historyItems">
+                                    <!-- Recent analysis results -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="dashboard.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>
+

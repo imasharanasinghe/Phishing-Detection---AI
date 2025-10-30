@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Phishing Detection AI - Protect Your Digital Life</title>
+  <link rel="stylesheet" href="styles.css?v=41"/>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <!-- Landing Page -->
+  <div id="landingPage">
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <h2>🛡️ Phishing Detection AI</h2>
+        </div>
+        <div class="nav-menu">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#pricing" class="nav-link">Pricing</a>
+          <a href="updates.html" class="nav-link">Global Threat Updates</a>
+          <a href="auth-signin.html" class="nav-link">Sign In</a>
+          <a href="auth-signup.html" class="nav-link">Get Started</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-video-background">
+        <video autoplay muted loop playsinline>
+          <source src="video/video2.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="hero-container">
+        <div class="hero-layout">
+          <div class="hero-content-glass">
+            <div class="hero-content">
+              <h1 class="hero-title">
+                <div class="hero-line-1">Protect Your Digital Life with</div>
+                <div class="hero-line-2 typing-text" id="typing-text"></div>
+              </h1>
+              <p class="hero-description">
+                Advanced machine learning algorithms analyze emails in real-time to detect phishing attempts, keeping your personal and business data secure from cyber threats.
+              </p>
+            </div>
+          </div>
+          <div class="hero-external-content">
+            <div class="hero-buttons">
+              <a href="auth-signup.html" class="btn-primary">Start Free Trial</a>
+              <a href="demo.html" class="btn-secondary">Watch Demo</a>
+            </div>
+            <div class="hero-stats">
+              <div class="stat">
+                <span class="stat-number">99.7%</span>
+                <span class="stat-label">Accuracy Rate</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">1M+</span>
+                <span class="stat-label">Emails Analyzed</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">50K+</span>
+                <span class="stat-label">Users Protected</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Powerful Protection for Your Inbox</h2>
+          <p class="section-subtitle">Advanced AI technology meets intuitive design to keep you safe from cyber threats</p>
+        </div>
+        
+        <div class="features-grid-modern">
+          <div class="feature-card-modern" data-delay="0">
+            <div class="feature-icon-modern">
+              <svg class="custom-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+                <path d="M19 15L19.5 17.5L22 18L19.5 18.5L19 21L18.5 18.5L16 18L18.5 17.5L19 15Z" fill="currentColor"/>
+                <path d="M5 15L5.5 17.5L8 18L5.5 18.5L5 21L4.5 18.5L2 18L4.5 17.5L5 15Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3>AI-Powered Analysis</h3>
+            <p>Advanced machine learning models trained on millions of phishing samples for maximum accuracy.</p>
+          </div>
+          
+          <div class="feature-card-modern" data-delay="100">
+            <div class="feature-icon-modern">
+              <svg class="custom-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="1" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3>Real-Time Detection</h3>
+            <p>Instant analysis of incoming emails with sub-second response times for immediate protection.</p>
+          </div>
+          
+          <div class="feature-card-modern" data-delay="200">
+            <div class="feature-icon-modern">
+              <svg class="custom-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3H21V21H3V3Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M9 9H15V15H9V9Z" fill="currentColor"/>
+                <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
+                <path d="M9 3V21" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <h3>Detailed Analytics</h3>
+            <p>Comprehensive reports and insights into your email security patterns and threat landscape.</p>
+          </div>
+          
+          <div class="feature-card-modern" data-delay="300">
+            <div class="feature-icon-modern">
+              <svg class="custom-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3>Gmail Integration</h3>
+            <p>Seamless Chrome extension integration with Gmail for automatic email scanning.</p>
+          </div>
+          
+          <div class="feature-card-modern" data-delay="400">
+            <div class="feature-icon-modern">
+              <svg class="custom-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M9 9H15V15H9V9Z" fill="currentColor"/>
+                <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
+                <path d="M9 3V21" stroke="currentColor" stroke-width="2"/>
+                <circle cx="18" cy="6" r="2" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3>Multi-Layer Protection</h3>
+            <p>Combines rule-based filtering with ML models for comprehensive threat detection.</p>
+          </div>
+          
+          <div class="feature-card-modern" data-delay="500">
+            <div class="feature-icon-modern">
+              <svg class="custom-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M8 21H16" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 17V21" stroke="currentColor" stroke-width="2"/>
+                <circle cx="6" cy="8" r="1" fill="currentColor"/>
+                <circle cx="10" cy="8" r="1" fill="currentColor"/>
+                <circle cx="14" cy="8" r="1" fill="currentColor"/>
+                <circle cx="18" cy="8" r="1" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3>Cross-Platform</h3>
+            <p>Works across web browsers, mobile devices, and integrates with popular email clients.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+        <section id="how-it-works" class="how-it-works">
+          <div class="container">
+            <div class="section-header">
+              <h2 class="section-title">How It Works</h2>
+              <p class="section-subtitle">Simple steps to comprehensive protection</p>
+            </div>
+            
+            <!-- Circular Process System Only -->
+            <div class="circular-process-container">
+          <!-- Central Hub -->
+          <div class="process-hub">
+            <!-- Animated Circular Rings -->
+            <div class="orbit-ring orbit-ring-1">
+              <div class="orbit-dot orbit-dot-1"></div>
+              <div class="orbit-dot orbit-dot-2"></div>
+              <div class="orbit-dot orbit-dot-3"></div>
+            </div>
+            <div class="orbit-ring orbit-ring-2">
+              <div class="orbit-dot orbit-dot-4"></div>
+              <div class="orbit-dot orbit-dot-5"></div>
+            </div>
+            <div class="orbit-ring orbit-ring-3">
+              <div class="orbit-dot orbit-dot-6"></div>
+              <div class="orbit-dot orbit-dot-7"></div>
+              <div class="orbit-dot orbit-dot-8"></div>
+              <div class="orbit-dot orbit-dot-9"></div>
+            </div>
+            
+               <div class="hub-content">
+                 <div class="hub-icon">
+                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                     <path d="M12 1V5M12 19V23M4.22 4.22L6.34 6.34M17.66 17.66L19.78 19.78M1 12H5M19 12H23M4.22 19.78L6.34 17.66M17.66 6.34L19.78 4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                   </svg>
+                 </div>
+                 <h3>AI Protection</h3>
+                 <p>Advanced Security System</p>
+               </div>
+            
+            <!-- Radial Connection Lines -->
+            <div class="radial-line radial-line-1"></div>
+            <div class="radial-line radial-line-2"></div>
+            <div class="radial-line radial-line-3"></div>
+          </div>
+          
+          <!-- Circular Steps -->
+          <div class="circular-step step-1" data-step="1">
+            <div class="step-circle">
+              <div class="step-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"/>
+                  <path d="M16 10L20 14M20 10L16 14" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="step-number">01</div>
+            </div>
+            <div class="step-info">
+              <h4>Connect Email</h4>
+              <p>Secure OAuth 2.0 authentication</p>
+              <div class="step-details">
+                <ul>
+                  <li>No password storage</li>
+                  <li>Read-only access</li>
+                  <li>Instant setup</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="circular-step step-2" data-step="2">
+            <div class="step-circle">
+              <div class="step-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+                  <circle cx="12" cy="12" r="1" fill="currentColor"/>
+                  <path d="M19 15L19.5 17.5L22 18L19.5 18.5L19 21L18.5 18.5L16 18L18.5 17.5L19 15Z" fill="currentColor"/>
+                  <path d="M5 15L5.5 17.5L8 18L5.5 18.5L5 21L4.5 18.5L2 18L4.5 17.5L5 15Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="step-number">02</div>
+            </div>
+            <div class="step-info">
+              <h4>AI Analysis</h4>
+              <p>Advanced threat detection</p>
+              <div class="step-details">
+                <ul>
+                  <li>NLP processing</li>
+                  <li>Pattern recognition</li>
+                  <li>Behavioral analysis</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="circular-step step-3" data-step="3">
+            <div class="step-circle">
+              <div class="step-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="18" cy="6" r="2" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="step-number">03</div>
+            </div>
+            <div class="step-info">
+              <h4>Get Protected</h4>
+              <p>Instant alerts & reports</p>
+              <div class="step-details">
+                <ul>
+                  <li>Real-time notifications</li>
+                  <li>Detailed reports</li>
+                  <li>Action recommendations</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Simple Pricing</h2>
+          <p class="section-subtitle">Choose the plan that fits your needs</p>
+        </div>
+        
+        <div class="pricing-toggle">
+          <span class="toggle-label">Monthly</span>
+          <label class="switch">
+            <input type="checkbox" id="pricingToggle">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">Annual <span class="save-badge">Save 20%</span></span>
+        </div>
+        
+        <div class="pricing-grid-modern">
+          <div class="pricing-card-modern">
+            <div class="pricing-header">
+              <h3>Free</h3>
+              <p class="plan-description">Perfect for personal use</p>
+              <div class="price-modern">
+                <span class="currency">$</span>
+                <span class="amount" data-monthly="0" data-annual="0">0</span>
+                <span class="period" data-monthly="/month" data-annual="/month">/month</span>
+              </div>
+            </div>
+            <ul class="features-list-modern">
+              <li><span class="check-icon">✓</span> 100 emails/month</li>
+              <li><span class="check-icon">✓</span> Basic threat detection</li>
+              <li><span class="check-icon">✓</span> Email reports</li>
+              <li><span class="check-icon">×</span> Real-time monitoring</li>
+              <li><span class="check-icon">×</span> Advanced analytics</li>
+            </ul>
+              <a href="auth-signup.html" class="btn-pricing btn-secondary">Get Started</a>
+          </div>
+          
+          <div class="pricing-card-modern featured">
+            <div class="popular-badge">Most Popular</div>
+            <div class="pricing-header">
+              <h3>Pro</h3>
+              <p class="plan-description">Ideal for small businesses</p>
+              <div class="price-modern">
+                <span class="currency">$</span>
+                <span class="amount" data-monthly="29" data-annual="23">29</span>
+                <span class="period" data-monthly="/month" data-annual="/month">/month</span>
+              </div>
+              <div class="annual-savings" data-monthly="" data-annual="Save $72/year">Save $72/year</div>
+            </div>
+            <ul class="features-list-modern">
+              <li><span class="check-icon">✓</span> 10,000 emails/month</li>
+              <li><span class="check-icon">✓</span> Advanced threat detection</li>
+              <li><span class="check-icon">✓</span> Real-time monitoring</li>
+              <li><span class="check-icon">✓</span> Detailed analytics</li>
+              <li><span class="check-icon">✓</span> Priority support</li>
+            </ul>
+            <a href="auth-signup.html" class="btn-pricing btn-primary">Start Free Trial</a>
+          </div>
+          
+          <div class="pricing-card-modern">
+            <div class="pricing-header">
+              <h3>Enterprise</h3>
+              <p class="plan-description">For large organizations</p>
+              <div class="price-modern">
+                <span class="currency">$</span>
+                <span class="amount" data-monthly="99" data-annual="79">99</span>
+                <span class="period" data-monthly="/month" data-annual="/month">/month</span>
+              </div>
+              <div class="annual-savings" data-monthly="" data-annual="Save $240/year">Save $240/year</div>
+            </div>
+            <ul class="features-list-modern">
+              <li><span class="check-icon">✓</span> Unlimited emails</li>
+              <li><span class="check-icon">✓</span> Enterprise-grade security</li>
+              <li><span class="check-icon">✓</span> Custom integrations</li>
+              <li><span class="check-icon">✓</span> Dedicated support</li>
+              <li><span class="check-icon">✓</span> Advanced reporting</li>
+            </ul>
+            <a href="auth-signup.html" class="btn-pricing btn-secondary">Contact Sales</a>
+          </div>
+        </div>
+        
+        <div class="pricing-features">
+          <div class="feature-comparison">
+            <div class="compare-icon">SEC</div>
+            <p>All plans include enterprise-grade security features and regular updates</p>
+          </div>
+          <div class="feature-comparison">
+            <div class="compare-icon">FREE</div>
+            <p>14-day free trial on all paid plans with no credit card required</p>
+          </div>
+          <div class="feature-comparison">
+            <div class="compare-icon">FLEX</div>
+            <p>Cancel anytime with no long-term contracts or hidden fees</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>🛡️ Phishing Detection AI</h3>
+            <p>Protecting your digital life with advanced AI technology.</p>
+          </div>
+          <div class="footer-section">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#pricing">Pricing</a></li>
+              <li><a href="demo.html">Demo</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Documentation</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="#">About</a></li>
+              <li><a href="#">Privacy</a></li>
+              <li><a href="#">Terms</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 Phishing Detection AI. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+  
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

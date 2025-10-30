@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    
+    <div>
+        <button id="testSignUp">Test Sign Up</button>
+        <button id="testSignIn">Test Sign In</button>
+        <button id="testSignOut">Test Sign Out</button>
+    </div>
+    
+    <div id="status"></div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsMfis_O6zi9_2b_a3MvFFzAH0xga8h_M",
+            authDomain: "phishing-detection-ai.firebaseapp.com",
+            projectId: "phishing-detection-ai",
+            storageBucket: "phishing-detection-ai.firebasestorage.app",
+            messagingSenderId: "360977256914",
+            appId: "1:360977256914:web:383f60bde5b0d9515a780b",
+            measurementId: "G-CGLMJMPN9J"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const statusDiv = document.getElementById('status');
+
+        function showStatus(message, isError = false) {
+            statusDiv.innerHTML = `<div class="${isError ? 'error' : 'success'}">${message}</div>`;
+        }
+
+        // Test Sign Up
+        document.getElementById('testSignUp').addEventListener('click', async () => {
+            try {
+                showStatus('Creating account...');
+                const userCredential = await auth.createUserWithEmailAndPassword('test@example.com', 'password123');
+                showStatus(`Account created! User ID: ${userCredential.user.uid}`);
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, true);
+            }
+        });
+
+        // Test Sign In
+        document.getElementById('testSignIn').addEventListener('click', async () => {
+            try {
+                showStatus('Signing in...');
+                const userCredential = await auth.signInWithEmailAndPassword('test@example.com', 'password123');
+                showStatus(`Signed in! User: ${userCredential.user.email}`);
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, true);
+            }
+        });
+
+        // Test Sign Out
+        document.getElementById('testSignOut').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showStatus('Signed out successfully');
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, true);
+            }
+        });
+
+        // Auth state listener
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                showStatus(`Currently signed in as: ${user.email}`);
+            } else {
+                showStatus('Not signed in');
+            }
+        });
+    </script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

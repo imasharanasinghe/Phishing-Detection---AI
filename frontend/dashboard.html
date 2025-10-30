@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Phishing Detection AI</title>
+    <link rel="stylesheet" href="styles.css?v=41">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Google API Client -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    
+    <!-- Gmail Configuration -->
+    <script src="gmail-config.js"></script>
+    
+    <style>
+        /* Scoped modern theme for dashboard */
+        body.dashboard-modern {
+            --primary: #4F709C;
+            --deep: #213555;
+            --text: #E6EEF8;
+            --muted: #B9C7D9;
+            --card-bg: rgba(255, 255, 255, 0.12);
+            --card-border: rgba(255, 255, 255, 0.18);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            background:
+                radial-gradient(1100px 600px at 0% -10%, rgba(79, 112, 156, 0.18), transparent 60%),
+                linear-gradient(180deg, #121d36 0%, #0d162b 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        /* Global text contrast in dashboard scope */
+        .dashboard-modern h1,
+        .dashboard-modern h2,
+        .dashboard-modern h3,
+        .dashboard-modern h4 { color: #ffffff; }
+        .dashboard-modern p,
+        .dashboard-modern span,
+        .dashboard-modern label { color: #EAF1FB; }
+        .dashboard-modern .stat-label,
+        .dashboard-modern .stat-subtitle { color: #E1EAF6; }
+        .dashboard-modern .history-stats .stat-number { color: #fff; }
+        .dashboard-modern .history-stats .stat-label { color: #EAF1FB; }
+        .dashboard-modern .btn-icon,
+        .dashboard-modern .no-history-icon,
+        .dashboard-modern .agent-icon,
+        .dashboard-modern .analyze-icon,
+        .dashboard-modern .flow-arrow { display: none !important; }
+
+        .dashboard-modern .dashboard-header {
+            background: #4F709C; /* solid brand color as requested */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-modern .dashboard-header .header-top h1,
+        .dashboard-modern .dashboard-header .header-top p {
+            margin: 0;
+        }
+        .dashboard-modern .dashboard-header .header-top h1 {
+            color: #ffffff;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            text-shadow: none;
+        }
+        .dashboard-modern .dashboard-header .header-top p {
+            color: #EAF1FB; /* high-contrast subtitle */
+            text-shadow: none;
+        }
+
+        .dashboard-modern .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 10px 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text);
+        }
+
+        /* Buttons */
+        .dashboard-modern .sign-out-btn,
+        .dashboard-modern .gmail-connect-btn,
+        .dashboard-modern .quick-check-trigger,
+        .dashboard-modern .quick-check-btn,
+        .dashboard-modern .action-btn,
+        .dashboard-modern .analyze-btn {
+            background: linear-gradient(135deg, var(--primary), #5d89b7);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 6px 20px rgba(79, 112, 156, 0.35);
+            transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+        }
+        .dashboard-modern .action-btn.secondary,
+        .dashboard-modern .analyze-btn.secondary {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--card-border);
+            color: var(--text);
+        }
+        .dashboard-modern .action-btn.danger,
+        .dashboard-modern .analyze-btn.clear {
+            background: linear-gradient(135deg, #b34d4d, #a53a3a);
+            border-color: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .dashboard-modern .sign-out-btn:hover,
+        .dashboard-modern .gmail-connect-btn:hover,
+        .dashboard-modern .quick-check-trigger:hover,
+        .dashboard-modern .quick-check-btn:hover,
+        .dashboard-modern .action-btn:hover,
+        .dashboard-modern .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(79, 112, 156, 0.45);
+        }
+
+        /* Cards & panels */
+        .dashboard-modern .modern-card,
+        .dashboard-modern .panel,
+        .dashboard-modern .chart-container,
+        .dashboard-modern .agent-card,
+        .dashboard-modern .history-panel,
+        .dashboard-modern .analyze-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: var(--shadow);
+        }
+        .dashboard-modern .modern-card:hover,
+        .dashboard-modern .panel:hover,
+        .dashboard-modern .chart-container:hover,
+        .dashboard-modern .agent-card:hover {
+            border-color: rgba(79, 112, 156, 0.55);
+            box-shadow: 0 20px 36px rgba(20, 28, 45, 0.45);
+            transform: translateY(-2px);
+            transition: all 220ms ease;
+        }
+
+        /* Stat cards enhancements */
+        .dashboard-modern .modern-card { position: relative; cursor: pointer; }
+        .dashboard-modern .stat-actions { position: absolute; top: 10px; right: 10px; }
+        .dashboard-modern .stat-menu-btn { 
+            background: rgba(255,255,255,0.08); border: 1px solid var(--card-border); color: #fff;
+            width: 28px; height: 28px; border-radius: 8px; line-height: 26px; font-weight: 700;
+        }
+        .dashboard-modern .stat-menu { position: absolute; top: 38px; right: 10px; display: none; 
+            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; min-width: 160px; box-shadow: var(--shadow); }
+        .dashboard-modern .stat-menu.open { display: block; }
+        .dashboard-modern .stat-menu button { display:block; width:100%; text-align:left; padding:10px 12px; background:transparent; border:0; color: var(--text); }
+        .dashboard-modern .stat-menu button:hover { background: rgba(255,255,255,0.08); }
+
+        /* Sparkline */
+        .dashboard-modern .sparkline { height: 36px; margin-top: 8px; opacity: 0.9; }
+        .dashboard-modern .sparkline canvas { width: 100% !important; height: 36px !important; }
+
+        /* Pulse when numbers update */
+        @keyframes pulseGlow { 0%{ text-shadow:none; } 50%{ text-shadow:0 0 12px rgba(255,255,255,0.6);} 100%{ text-shadow:none; } }
+        .dashboard-modern .stat-value.pulse { animation: pulseGlow 800ms ease; }
+
+        /* Target ring around icon */
+        .dashboard-modern .stat-icon { position: relative; z-index: 1; }
+        .dashboard-modern .stat-icon::before { 
+            content:''; position:absolute; inset:-6px; border-radius: 14px; z-index: -1;
+            background: conic-gradient(var(--primary) calc(var(--ring, 0) * 1turn), rgba(255,255,255,0.12) 0);
+            -webkit-mask: radial-gradient(circle at center, transparent 16px, #000 17px);
+            mask: radial-gradient(circle at center, transparent 16px, #000 17px);
+        }
+
+        /* Stat cards */
+        .dashboard-modern .stat-card-header { align-items: center; }
+        .dashboard-modern .stat-icon-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dashboard-modern .stat-icon {
+            width: 44px; height: 44px;
+            display: grid; place-items: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--deep));
+            color: #fff;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18), 0 6px 18px rgba(79, 112, 156, 0.35);
+        }
+        .dashboard-modern .stat-trend.up { color: #7de18d; }
+        .dashboard-modern .stat-trend.down { color: #f59f9f; }
+        .dashboard-modern .stat-info h4 { color: var(--text); margin: 0 0 4px 0; }
+        .dashboard-modern .stat-value { color: #fff; font-weight: 700; font-size: 1.6rem; }
+        .dashboard-modern .stat-subtitle { color: var(--muted); }
+        .dashboard-modern .stat-progress { height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+        .dashboard-modern .stat-progress .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), #6ea0d0); }
+
+        /* Stat cards palette update (requested #213555) */
+        .dashboard-modern .stats-grid .modern-card {
+            background: #213555;
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+        .dashboard-modern .stats-grid .modern-card .stat-info h4,
+        .dashboard-modern .stats-grid .modern-card .stat-value,
+        .dashboard-modern .stats-grid .modern-card .stat-subtitle {
+            color: #ffffff;
+        }
+        .dashboard-modern .stats-grid .modern-card .stat-subtitle { opacity: 0.9; }
+        .dashboard-modern .stats-grid .modern-card .stat-progress { background: rgba(255, 255, 255, 0.15); }
+        .dashboard-modern .stats-grid .modern-card .progress-bar { background: linear-gradient(90deg, #4F709C, #6ea0d0); }
+
+        /* Force 4-up layout on desktop, responsive down to 2 and 1 */
+        .dashboard-modern .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 24px;
+            align-items: stretch;
+        }
+        @media (max-width: 1200px) {
+            .dashboard-modern .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 640px) {
+            .dashboard-modern .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Inputs */
+        .dashboard-modern .email-textarea,
+        .dashboard-modern .quick-input,
+        .dashboard-modern .filter-select {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            border-radius: 12px;
+        }
+        .dashboard-modern .email-textarea::placeholder,
+        .dashboard-modern .quick-input::placeholder { color: rgba(230, 238, 248, 0.55); }
+        .dashboard-modern .email-textarea:focus,
+        .dashboard-modern .quick-input:focus,
+        .dashboard-modern .filter-select:focus {
+            outline: none;
+            border-color: rgba(79, 112, 156, 0.8);
+            box-shadow: 0 0 0 3px rgba(79, 112, 156, 0.25);
+        }
+
+        /* Modals */
+        .dashboard-modern .modal-overlay {
+            background: rgba(10, 16, 28, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+        .dashboard-modern .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            color: var(--text);
+        }
+        .dashboard-modern .modal-header h2,
+        .dashboard-modern .modal-header h3 { color: #fff; }
+
+        /* Sections */
+        .dashboard-modern .section-title { color: #fff; }
+        .dashboard-modern .section-subtitle { color: var(--muted); }
+
+        /* Data flow pills */
+        .dashboard-modern .flow-step .step-number {
+            background: linear-gradient(135deg, var(--primary), var(--deep));
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 6px 16px rgba(79, 112, 156, 0.35);
+        }
+        .dashboard-modern .flow-arrow { color: rgba(230, 238, 248, 0.6); }
+
+        /* Risk Distribution chart visibility */
+        .dashboard-modern .chart-container {
+            background: #213555;
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+        .dashboard-modern .chart-container h3,
+        .dashboard-modern .chart-container p { color: #ffffff; }
+        .dashboard-modern .chart-container h3::before { content: none; }
+
+        /* Apply #213555 to History, Analysis panel, and Agent cards */
+        .dashboard-modern .history-panel,
+        .dashboard-modern .analyze-section,
+        .dashboard-modern .agent-card {
+            background: #213555;
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+        .dashboard-modern .history-panel h2,
+        .dashboard-modern .history-panel p,
+        .dashboard-modern .history-panel .history-stats .stat-item .stat-number,
+        .dashboard-modern .history-panel .history-stats .stat-item .stat-label,
+        .dashboard-modern .history-panel .history-item .history-subject,
+        .dashboard-modern .history-panel .history-item .history-date,
+        .dashboard-modern .history-panel .history-item .history-score { color: #ffffff; }
+        .dashboard-modern .history-panel .filter-select { color: #EAF1FB; background: rgba(255,255,255,0.06); border-color: var(--card-border); }
+
+        .dashboard-modern .analyze-section h2,
+        .dashboard-modern .analyze-section p,
+        .dashboard-modern .analyze-section .input-label span { color: #ffffff; }
+        .dashboard-modern .email-textarea { color: #EAF1FB; }
+
+        .dashboard-modern .agent-card h3,
+        .dashboard-modern .agent-card p,
+        .dashboard-modern .agent-card .agent-role,
+        .dashboard-modern .agent-card .status-text,
+        .dashboard-modern .agent-card .preview-label,
+        .dashboard-modern .agent-card .preview-value { color: #ffffff; }
+    </style>
+    <style>
+        /* Sidebar + Hero minimal styles (scoped) */
+        .dash-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .dash-sidebar { background:#1a2a48; border-right:1px solid rgba(255,255,255,0.14); padding:18px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; }
+        .dash-brand { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; letter-spacing:.2px; }
+        .dash-nav { margin-top:18px; display:flex; flex-direction:column; gap:4px; }
+        .dash-link { color:#EAF1FB; padding:10px 12px; border-radius:10px; text-decoration:none; display:flex; align-items:center; gap:10px; border:1px solid transparent; }
+        .dash-link:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); }
+        .dash-link.active { background:rgba(255,255,255,0.10); border-color:#4F709C; box-shadow:0 0 0 2px rgba(79,112,156,0.35) inset; color:#fff; }
+        .dash-hero { background:#213555; border-bottom:1px solid rgba(255,255,255,0.14); padding:24px 24px; color:#fff; }
+        .dash-hero .subtitle { color:#EAF1FB; opacity:.95; margin-top:6px; }
+        .user-block { margin-top:14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:12px; color:#fff; }
+        .user-email { font-weight:600; word-break:break-all; }
+        .user-actions { display:flex; gap:8px; margin-top:10px; }
+        .sb-bottom { margin-top:auto; display:flex; flex-direction:column; gap:8px; }
+        @media (max-width: 900px){ .dash-shell{ grid-template-columns: 1fr; } .dash-sidebar{ display:none; } }
+    </style>
+</head>
+<body class="dashboard-modern">
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">Phishing Detection AI</div>
+            <div class="user-block">
+                <div class="user-email" id="sbUserEmail">Loading…</div>
+                <div style="opacity:.9;font-size:.85rem;">Plan: <span id="sbPlan">Free</span></div>
+                <div class="user-actions">
+                    <button id="sbConnectGmail" class="action-btn secondary" style="padding:6px 10px;">Connect Gmail</button>
+                </div>
+            </div>
+            <nav class="dash-nav">
+                <a class="dash-link active" href="dashboard.html">Overview</a>
+                <a class="dash-link" href="dashboard-analysis.html">Analysis</a>
+                <a class="dash-link" href="dashboard-history.html">History</a>
+                <a class="dash-link" href="dashboard-threats.html">Threats</a>
+                <a class="dash-link" href="dashboard-reports.html">Reports</a>
+                <a class="dash-link" href="dashboard-integrations.html">Integrations</a>
+                <a class="dash-link" href="dashboard-team.html">Team</a>
+                <a class="dash-link" href="dashboard-plan.html">Plan & Billing</a>
+                <a class="dash-link" href="dashboard-settings.html">Settings</a>
+                <a class="dash-link" href="updates.html">Support</a>
+            </nav>
+            <div class="sb-bottom">
+                <button id="sbSignOut" class="action-btn danger" style="padding:8px 12px;">Sign Out</button>
+            </div>
+        </aside>
+        <div>
+            <div class="dash-hero">
+                <h1 style="margin:0">Overview</h1>
+                <div class="subtitle">Your email security posture at a glance.</div>
+            </div>
+
+            <!-- Hero KPIs -->
+            <section class="kpi-row" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:16px 24px;">
+                <div class="kpi-card" style="background:#213555;border:1px solid rgba(255,255,255,0.22);border-radius:14px;padding:14px;color:#fff;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div style="font-weight:600;opacity:.95;">Today’s Scans</div>
+                        <div id="kpiScansDelta" style="font-size:.85rem;color:#7de18d;">+0%</div>
+                    </div>
+                    <div id="kpiScans" style="font-size:1.8rem;font-weight:800;margin-top:4px;">0</div>
+                    <div class="sparkline" style="height:32px;margin-top:6px;"><canvas id="spark-kpi-scans"></canvas></div>
+                </div>
+                <div class="kpi-card" style="background:#213555;border:1px solid rgba(255,255,255,0.22);border-radius:14px;padding:14px;color:#fff;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div style="font-weight:600;opacity:.95;">Threats Detected</div>
+                        <div id="kpiThreatsDelta" style="font-size:.85rem;color:#f59f9f;">0%</div>
+                    </div>
+                    <div id="kpiThreats" style="font-size:1.8rem;font-weight:800;margin-top:4px;">0</div>
+                    <div class="sparkline" style="height:32px;margin-top:6px;"><canvas id="spark-kpi-threats"></canvas></div>
+                </div>
+                <div class="kpi-card" style="background:#213555;border:1px solid rgba(255,255,255,0.22);border-radius:14px;padding:14px;color:#fff;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div style="font-weight:600;opacity:.95;">Accuracy</div>
+                        <div id="kpiAccuracyDelta" style="font-size:.85rem;color:#7de18d;">+0.0%</div>
+                    </div>
+                    <div id="kpiAccuracy" style="font-size:1.8rem;font-weight:800;margin-top:4px;">98.5%</div>
+                    <div class="sparkline" style="height:32px;margin-top:6px;"><canvas id="spark-kpi-accuracy"></canvas></div>
+                </div>
+            </section>
+
+            <!-- Spotlight + Quota/Anomalies -->
+            <section style="display:grid;grid-template-columns:2fr 1fr;gap:16px;padding:0 24px 16px;">
+                <!-- Threat Spotlight -->
+                <div class="panel" style="background:#213555;border:1px solid rgba(255,255,255,0.22);border-radius:14px;overflow:hidden;">
+                    <div style="padding:14px 16px;color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.14);">Recent High‑Risk</div>
+                    <div id="spotlight" style="display:flex;gap:12px;padding:12px 16px;overflow:auto;scrollbar-width:thin;">
+                    </div>
+                </div>
+
+                <!-- Quota + Anomalies -->
+                <div style="display:grid;grid-template-rows:auto auto;gap:16px;">
+                    <div class="panel" style="background:#213555;border:1px solid rgba(255,255,255,0.22);border-radius:14px;padding:14px;">
+                        <div style="color:#fff;font-weight:600;margin-bottom:8px;">Monthly Quota</div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div id="quotaRing" style="width:84px;height:84px;position:relative;border-radius:50%;background:conic-gradient(#4F709C var(--pct,0%), rgba(255,255,255,0.14) 0);">
+                                <div style="position:absolute;inset:8px;border-radius:50%;background:#13213a;display:grid;place-items:center;color:#fff;font-weight:700;" id="quotaPct">0%</div>
+                            </div>
+                            <div style="color:#EAF1FB;">
+                                <div><strong id="quotaUsed">0</strong> / <span id="quotaTotal">1000</span> analyses</div>
+                                <div id="quotaHint" style="opacity:.9;font-size:.9rem;">Plenty left this month.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel" style="background:#213555;border:1px solid rgba(255,255,255,0.22);border-radius:14px;padding:14px;">
+                        <div style="color:#fff;font-weight:600;margin-bottom:8px;">This Week vs Last Week</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;color:#fff;">
+                            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:10px;">
+                                <div style="opacity:.9;font-size:.9rem;">Scans</div>
+                                <div style="display:flex;align-items:baseline;gap:8px;">
+                                    <div id="deltaScans" style="font-weight:800;font-size:1.4rem;">+0%</div>
+                                    <div id="deltaScansHint" style="opacity:.9;font-size:.85rem;">vs last week</div>
+                                </div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:10px;">
+                                <div style="opacity:.9;font-size:.9rem;">Threats</div>
+                                <div style="display:flex;align-items:baseline;gap:8px;">
+                                    <div id="deltaThreats" style="font-weight:800;font-size:1.4rem;">0%</div>
+                                    <div id="deltaThreatsHint" style="opacity:.9;font-size:.85rem;">vs last week</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+    <!-- Dashboard Header -->
+    <!-- Removed legacy header; email and actions are in sidebar -->
+
+
+    <!-- Sign Out Confirmation Modal -->
+    <div id="signOutModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content sign-out-modal">
+            <div class="modal-header">
+                <h3>Sign Out</h3>
+                <button class="modal-close" onclick="closeSignOutModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="sign-out-icon" style="display:none"></div>
+                <p>Are you sure you want to sign out?</p>
+                <p class="sign-out-subtitle">You'll need to sign in again to access your dashboard.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeSignOutModal()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmSignOut()">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Check Modal -->
+    <div id="quickCheckModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Quick Email Check</h2>
+                <button id="closeQuickCheckModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="quick-check-form">
+                    <div class="input-group">
+                        <input type="text" id="quickEmailUrl" placeholder="Paste email URL or content here..." class="quick-input">
+                        <button id="quickCheckBtn" class="quick-check-btn">
+                            <span class="btn-icon">🔍</span>
+                            <span class="btn-text">Analyze</span>
+                        </button>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" data-action="gmail">
+                            <span class="action-icon">📧</span>
+                            <span>Gmail</span>
+                        </button>
+                        <button class="quick-action-btn" data-action="outlook">
+                            <span class="action-icon">📮</span>
+                            <span>Outlook</span>
+                        </button>
+                        <button class="quick-action-btn" data-action="yahoo">
+                            <span class="action-icon">📨</span>
+                            <span>Yahoo</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Results Section -->
+                <div id="quickCheckResults" class="quick-results" style="display: none;">
+                    <div class="results-header">
+                        <h3>Analysis Results</h3>
+                        <div class="risk-indicator" id="quickRiskIndicator">
+                            <span class="risk-score" id="quickRiskScore">0%</span>
+                            <span class="risk-label" id="quickRiskLabel">Safe</span>
+                        </div>
+                    </div>
+                    <div class="results-content">
+                        <div class="chart-container-small">
+                            <canvas id="quickCheckChart"></canvas>
+                        </div>
+                        <div class="results-summary" id="quickResultsSummary">
+                            <!-- Summary will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Main Content -->
+    <main class="dashboard-main" style="padding: 0 24px 24px;">
+        <!-- Simplified: Only Risk Distribution remains on Overview -->
+
+        <!-- Main Dashboard Grid -->
+        <div class="main-dashboard-grid">
+            <!-- Left Column -->
+            <div class="dashboard-left">
+                <!-- Chart Container -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Risk Distribution</h3>
+                        <p>Analysis results from your recent scans</p>
+                    </div>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Analysis panel removed on Overview -->
+            </div>
+
+            <!-- Right Column removed on Overview -->
+        </div>
+
+        <!-- Agents and data flow sections removed on Overview -->
+
+    </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="dashboard.js"></script>
+  <script src="chatbot.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Phishing Detection AI \u2014 Gmail Analyzer",
+  "version": "0.1.0",
+  "description": "Send selected Gmail contents to backend for phishing analysis.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*"
+  ],
+  "action": {
+    "default_title": "Analyze Inbox",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

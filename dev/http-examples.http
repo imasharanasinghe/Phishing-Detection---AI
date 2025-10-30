@@ -1,0 +1,12 @@
+
+### VS Code/REST Client style HTTP file
+
+GET http://localhost:3000/api/health
+
+###
+POST http://localhost:3000/api/analyze
+Content-Type: application/json
+
+{
+  "email_text": "Subject: Urgent verification needed\nClick http://paypa1.com now"
+}
