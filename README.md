@@ -151,7 +151,7 @@ LOG_LEVEL=INFO
 
 ### Model Training
 
-The system includes a baseline Logistic Regression model trained on synthetic data. For production:
+A baseline Logistic Regression model that was trained on synthetic data is part of the system. For production:
 
 1. Collect labeled phishing/legitimate emails
 2. Train XGBoost model with real data
